@@ -12,7 +12,6 @@ This module contains the hardware timer used to keep track of the system time us
 
 static const char* TAG = "clock_management_log";
 
-
 typedef struct stime_t {
 	unsigned int hour = 0;
 	unsigned int minute = 0;

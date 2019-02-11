@@ -10,6 +10,9 @@
 
 #include "esp_system.h"
 
+#include "connect_to_wifi.h"
+#include "TCP_server/TCP_server.h"
+
 /******************************************************************************
  * FunctionName : app_main
  * Description  : entry of user application, init user function here
@@ -18,5 +21,7 @@
 *******************************************************************************/
 void app_main(void)
 {
-    printf("SDK version:%s\n", esp_get_idf_version());
+    initialise_wifi();
+    wait_for_ip();
+    xTaskCreate(tcp_server_task, "tcp_server", 4096, NULL, 5, NULL);
 }

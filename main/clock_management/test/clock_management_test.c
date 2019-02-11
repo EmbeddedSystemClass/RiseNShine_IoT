@@ -22,7 +22,7 @@ static const char *TAG = "clock_mgmt_test";
 
 void app_main(void)
 {
-    ESP_LOGI(TAG, "GPIO config");
+    //ESP_LOGI(TAG, "GPIO config");
     gpio_config_t io_conf;
     io_conf.intr_type = GPIO_INTR_DISABLE;
     io_conf.mode = GPIO_MODE_OUTPUT;
