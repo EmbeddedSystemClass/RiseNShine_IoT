@@ -3,7 +3,7 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := risenshine_iot 
+PROJECT_NAME := risenshine_iot
 
 include $(IDF_PATH)/make/project.mk
 

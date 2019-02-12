@@ -11,15 +11,16 @@
 #include "esp_wifi.h"
 #include "esp_event_loop.h"
 #include "esp_log.h"
-#include "nvs_flash.h"
 
-#include "lwip/err.h"
-#include "lwip/sockets.h"
-#include "lwip/sys.h"
-#include <lwip/netdb.h>
+const int IPV4_GOTIP_BIT = BIT0;
+#ifdef CONFIG_EXAMPLE_IPV6
+const int IPV6_GOTIP_BIT = BIT1;
+#endif
 
 #define EXAMPLE_WIFI_SSID CONFIG_WIFI_SSID
 #define EXAMPLE_WIFI_PASS CONFIG_WIFI_PASSWORD
+
+static const char *TAG = "Connect_to_wifi log:";
 
 static EventGroupHandle_t wifi_event_group;
 
