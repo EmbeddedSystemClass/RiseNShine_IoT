@@ -7,18 +7,12 @@
 
 static char* TAG = "stepper_log_c";
 
-/* Stepper motor full-step sequence 
- *
- *
- *   State A B C D
- *     1   1 0 0 0
- *     2   0 1 0 0
- *     3   0 0 1 0
- *     4   0 0 0 1
- *
+/**
+ * Enums used to describe the different states
+ * of the stepper motor
  */
-
-typedef enum {
+typedef enum 
+{
     //for output state
     OFF = 0,
     ON,
@@ -44,12 +38,16 @@ typedef enum {
                                       (1ULL<<stepperPinC) | \
                                       (1ULL<<stepperPinD) )
 
-// Static global vars
 static state_e cwDirection = CLOCKWISE;
-static state_e stepperState = stateA;
+static int stepperState = (int)stateA;
 static int numStepsLeft = 0;
 
-void initStepperPins() {
+/**
+ * Initializes the GPIO pins for the stepper motors. Pins
+ * are defined in stepper.h
+ */
+void initStepperPins() 
+{
     ESP_LOGI(TAG, "Stepper GPIO config");
     gpio_config_t io_conf;
     io_conf.intr_type = GPIO_INTR_DISABLE;
@@ -60,27 +58,44 @@ void initStepperPins() {
     gpio_config(&io_conf);
 }
 
-void moveStepper(int stepsnum) {
+/**
+ * Increases the amount of steps queued for the stepper
+ * 
+ * @param stepsnum - number of steps to add
+ */
+void moveStepper(int stepsnum) 
+{
     numStepsLeft += stepsnum;
 }
 
-void stopStepper() {
+/**
+ * Clears the number steps queue
+ */
+void stopStepper() 
+{
     numStepsLeft = 0;
 }
 
-void changeStepperDirection() {
+/**
+ * Changes the direction of the current stepper direction
+ */
+void changeStepperDirection() 
+{
     cwDirection = !cwDirection;
 }
 
-static void changePinOutputs(state_e A, state_e B, state_e C, state_e D) {
+static void changePinOutputs(state_e A, state_e B, state_e C, state_e D) 
+{
     gpio_set_level(stepperPinA, A);
     gpio_set_level(stepperPinB, B);
     gpio_set_level(stepperPinC, C);
     gpio_set_level(stepperPinD, D);
 }
 
-static void applyState() {
-    if (numStepsLeft != 0) {
+static void applyState() 
+{
+    if (numStepsLeft != 0) 
+    {
         switch(stepperState) {
             case stateA:
                 changePinOutputs(ON , OFF, OFF, OFF);
@@ -101,10 +116,23 @@ static void applyState() {
 }
 
 // @todo how to increment state stored as enums?
-static void changeState() {
-    if (cwDirection == CLOCKWISE) {
+static void changeState() 
+{
+    if (cwDirection == CLOCKWISE) 
+    {
         stepperState++;
-        if (stepper)
+        if (stepperState == ((int)stateD+1)) 
+        {
+            stepperState = (int)stateA;
+        }
+    }
+    else if (cwDirection == COUNTCLOCKWISE) 
+    {
+        stepperState--;
+        if (stepperState ==((int)stateA-1))
+        {
+            stepperState = (int)stateD;
+        }
     }
 }
 
