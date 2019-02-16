@@ -6,45 +6,14 @@
 #include "stepper.h"
 
 static char* TAG = "stepper_log_c";
-
-/**
- * Enums used to describe the different states
- * of the stepper motor
- */
-typedef enum 
-{
-    //for output state
-    OFF = 0,
-    ON,
-
-    //for stepper states
-    stateA = 0,
-    stateB,
-    stateC,
-    stateD,
-
-    //for direction
-    CLOCKWISE = 0,
-    COUNTCLOCKWISE
-} state_e;
-
-#define stepperPinA 14 // D5
-#define stepperPinB 12 // D6
-#define stepperPinC 13 // D7
-#define stepperPinD 15 // D8
-
-#define GPIO_STEPPER_OUTPUT_BITMASK ( (1ULL<<stepperPinA) | \
-                                      (1ULL<<stepperPinB) | \
-                                      (1ULL<<stepperPinC) | \
-                                      (1ULL<<stepperPinD) )
-
 static state_e cwDirection = CLOCKWISE;
 static int stepperState = (int)stateA;
 static int numStepsLeft = 0;
 
 /**
  * Initializes the GPIO pins for the stepper motors. Pins
- * are defined in stepper.h
+ * are defined in stepper.h. It's on the developer to ensure
+ * there's no pin conflict
  */
 void initStepperPins() 
 {
@@ -59,7 +28,7 @@ void initStepperPins()
 }
 
 /**
- * Increases the amount of steps queued for the stepper
+ * Increases the amount of steps queued for the stepper  
  * 
  * @param stepsnum - number of steps to add
  */
