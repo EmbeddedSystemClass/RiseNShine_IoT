@@ -1,5 +1,5 @@
 /**
- * risenshine_systemtasks.h
+ * risenshine_systemtasksconfig.h
  * 
  * Header files to contain the different tasks config for the RTOS
  */

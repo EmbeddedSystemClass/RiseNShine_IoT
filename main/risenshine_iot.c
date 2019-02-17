@@ -4,7 +4,7 @@
 #include "esp_system.h"
 
 #include "connect_to_wifi.h"
-#include "risenshine_systemtasks.h"
+#include "risenshine_systemtasksconfig.h"
 
 #include "esp_log.h"
 #include "nvs_flash.h" // for nvs_flash_init()
