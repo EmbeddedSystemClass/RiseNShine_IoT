@@ -12,10 +12,12 @@
 // Priority Levels
 #define CLOCK_MANAGEMENT_PRIORITY 10
 #define TCP_SERVER_PRIORITY 9
+#define STEPPER_CONTROL_PRIORITY 8
 
 // Stack size config
 #define CLOCK_MANAGEMENT_STACKSIZE 2048
 #define TCP_SERVER_STACKSIZE 4096
+#define STEPPER_CONTROL_STACKSIZE 2048
 
 
 /***************************/
@@ -65,6 +67,15 @@ TaskParametersList_t s_TCPServerTask = {
     .sizeOfStackinWords=  TCP_SERVER_STACKSIZE,
     .pvTaskParameters=    NULL,
     .uxPriority=          TCP_SERVER_PRIORITY,
+    .pxCreatedTask=       NULL  
+};
+
+TaskParametersList_t s_StepperControlTask = { 
+    .functionCall=        vTaskStepperMotorControl,
+    .taskName=            "stepper_motor_control",
+    .sizeOfStackinWords=  STEPPER_CONTROL_STACKSIZE,
+    .pvTaskParameters=    NULL,
+    .uxPriority=          STEPPER_CONTROL_PRIORITY,
     .pxCreatedTask=       NULL  
 };
 

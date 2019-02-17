@@ -15,4 +15,5 @@ void app_main()
     wait_for_ip();
     xTaskCreate_wrapper(s_clockMgtTask);
     xTaskCreate_wrapper(s_TCPServerTask);
+    xTaskCreate_wrapper(s_StepperControlTask);
 }
