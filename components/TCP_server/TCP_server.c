@@ -6,13 +6,15 @@
 
 static const char * TAG = "TCP_Module log:";
 
-bool tcp_createAndBindSocket(struct sockaddr_in *destAddr, int * listen_sock)
+bool tcp_createAndBindSocket(struct sockaddr_in *destAddr, int * const listen_sock)
 {
+    char addr_str[128];
+
     // Set up the address for the socket
     destAddr->sin_addr.s_addr = htonl(INADDR_ANY);
     destAddr->sin_family = AF_INET;
     destAddr->sin_port = htons(PORT);
-    //inet_ntoa_r(destAddr.sin_addr, addr_str, sizeof(addr_str) - 1);
+    inet_ntoa_r(destAddr->sin_addr, addr_str, sizeof(addr_str) - 1);
 
     // Create Socket
     *listen_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
@@ -24,7 +26,7 @@ bool tcp_createAndBindSocket(struct sockaddr_in *destAddr, int * listen_sock)
 
     // Bind the socket to the port
     int err = -1;
-    err = bind(*listen_sock, (struct sockaddr *)&destAddr, sizeof(destAddr));
+    err = bind(*listen_sock, (struct sockaddr *)destAddr, sizeof(*destAddr));
     if (err != 0) {
         ESP_LOGE(TAG, "Socket unable to bind: errno %d", errno);
         return false;

@@ -48,7 +48,7 @@ void vTaskClockSystem(void *pvParameters)
 	{
 		increment_time(&current_time);
 		//gpio_set_level(GPIO_LED_OUTPUT_IO, ++cnt % 2);
-		ESP_LOGI(TAG, "Current time: %d:%d:%d", current_time.hour, current_time.minute,current_time.second);
+		//ESP_LOGI(TAG, "Current time: %d:%d:%d", current_time.hour, current_time.minute,current_time.second);
 
 
 		if(current_time.second == 0)

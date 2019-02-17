@@ -8,6 +8,10 @@
 
 #include "TCP_server.h"
 
+#include "esp_log.h"
+
+const char * TAG = "TCP task";
+
 static int charToInt(char * chars, int len)
 {
     int x = 0;
@@ -25,6 +29,7 @@ static int charToInt(char * chars, int len)
 void processTCPCommand(char* dataBuffer, int len)
 {
     int numSteps = charToInt(dataBuffer, len);
+    ESP_LOGI(TAG, "Received number: %d", numSteps);
     xQueueSend(qStepperMotorSteps, &numSteps, 0);
 }
 
@@ -36,7 +41,13 @@ void vTaskTCPServer(void *pvParameters)
     qStepperMotorSteps = xQueueCreate(2, sizeof(int));
     if(tcp_createAndBindSocket(&my_addr, &socketfd))
     {
-        //what do if i can't bind a socket
+        tcp_acceptClients(socketfd, &processTCPCommand);
     }
-    tcp_acceptClients(socketfd, &processTCPCommand);
+    else
+    {
+        vTaskDelete(NULL);
+        /* code */
+    }
+    
+    
 }

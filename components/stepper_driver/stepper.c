@@ -8,7 +8,7 @@
 static char* TAG = "stepper_log_c";
 static state_e cwDirection = CLOCKWISE;
 static int stepperState = (int)stateA;
-static int numStepsLeft = 0;
+static uint numStepsLeft = 0;
 
 /**
  * Initializes the GPIO pins for the stepper motors. Pins
@@ -88,6 +88,7 @@ void stepper_applyState()
 {
     if (numStepsLeft != 0) 
     {
+        changeState();
         switch(stepperState) {
             case stateA:
                 changePinOutputs(ON , OFF, OFF, OFF);
@@ -104,7 +105,7 @@ void stepper_applyState()
             default:
                 changePinOutputs(OFF, OFF, OFF, OFF);
         }
-        changeState();
+        numStepsLeft--;
     }
 }
 
