@@ -6,44 +6,56 @@
 
 static const char *TAG = "TCP_Module log:";
 
-void tcp_server()
+static int charToInt(char * chars, int len)
 {
-    char rx_buffer[128];
-    char addr_str[128];
-    int addr_family;
-    int ip_protocol;
-    int is_create_socket_success = 1;
-    int is_socket_binded_success = 1;
+    int x;
+    int i;
+    for(i = 0; i < len; i++) 
+    {
+        if(chars[i] >= '0' && chars[i] <= '9')
+        {
+            x = x*10 + (chars[i]-'0');
+        }
+    }
+    return x;
+}
 
-    struct sockaddr_in destAddr;
-    destAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    destAddr.sin_family = AF_INET;
-    destAddr.sin_port = htons(PORT);
-    addr_family = AF_INET;
-    ip_protocol = IPPROTO_IP;
-    inet_ntoa_r(destAddr.sin_addr, addr_str, sizeof(addr_str) - 1);
+bool tcp_createAndBindSocket(struct sockaddr_in *destAddr, int * listen_sock)
+{
+    // Set up the address for the socket
+    destAddr->sin_addr.s_addr = htonl(INADDR_ANY);
+    destAddr->sin_family = AF_INET;
+    destAddr->sin_port = htons(PORT);
+    //inet_ntoa_r(destAddr.sin_addr, addr_str, sizeof(addr_str) - 1);
 
-
-    int listen_sock = socket(addr_family, SOCK_STREAM, ip_protocol);
-    if (listen_sock < 0) {
+    // Create Socket
+    *listen_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+    if (*listen_sock < 0) {
         ESP_LOGE(TAG, "Unable to create socket: errno %d", errno);
-        is_create_socket_success = 0;
+        return false;
     }
     ESP_LOGI(TAG, "Socket created");
 
+    // Bind the socket to the port
     int err = -1;
-    if (is_create_socket_success == 1) {
-        err = bind(listen_sock, (struct sockaddr *)&destAddr, sizeof(destAddr));
-        if (err != 0) {
-            ESP_LOGE(TAG, "Socket unable to bind: errno %d", errno);
-            is_socket_binded_success = 0;
-        }
-        ESP_LOGI(TAG, "Socket binded");
+    err = bind(*listen_sock, (struct sockaddr *)&destAddr, sizeof(destAddr));
+    if (err != 0) {
+        ESP_LOGE(TAG, "Socket unable to bind: errno %d", errno);
+        return false;
     }
+    ESP_LOGI(TAG, "Socket binded");
+    
+    return true;
+}
 
-    while (is_socket_binded_success == 1 && is_create_socket_success == 1) {
+void tcp_acceptClients(int listen_sock, void (*callback_ptr)(char* buffer, int len) )
+{
+    char rx_buffer[128];
+    char addr_str[128];
 
-        err = listen(listen_sock, 1);
+    while (1) 
+    {
+        int err = listen(listen_sock, 1);
         if (err != 0) {
             ESP_LOGE(TAG, "Error occured during listen: errno %d", errno);
             break;
@@ -79,6 +91,7 @@ void tcp_server()
                 ESP_LOGI(TAG, "Received %d bytes from %s:", len, addr_str);
                 ESP_LOGI(TAG, "%s", rx_buffer);
 
+                (*callback_ptr)(rx_buffer, len);
                 int err = send(sock, rx_buffer, len, 0);
                 if (err < 0) {
                     ESP_LOGE(TAG, "Error occured during sending: errno %d", errno);
@@ -89,7 +102,7 @@ void tcp_server()
 
         if (sock != -1) {
             ESP_LOGE(TAG, "Shutting down socket and restarting...");
-            //shutdown(sock, 0);
+            shutdown(sock, 0);
             close(sock);
         }
     }
