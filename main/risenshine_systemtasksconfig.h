@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "TCP_server.h"
-#include "clock_management.h"
+#include "Tasks/include/risenshine_systemtasks.h"
+
 
 // Priority Levels
 #define CLOCK_MANAGEMENT_PRIORITY 10
@@ -60,7 +60,7 @@ TaskParametersList_t s_clockMgtTask = {
 
 /* TCP Server Task */
 TaskParametersList_t s_TCPServerTask = { 
-    .functionCall=        tcp_server,
+    .functionCall=        vTaskTCPServer,
     .taskName=            "tcp_server_task",
     .sizeOfStackinWords=  TCP_SERVER_STACKSIZE,
     .pvTaskParameters=    NULL,

@@ -8,11 +8,6 @@
 
 #pragma once
 
-#include "clock_management.h"
-#include "TCP_server.h"
-#include "connect_to_wifi.h"
-#include "stepper.h"
-
 void vTaskClockSystem(void* pvParameters);
 void vTaskTCPServer(void* pvParameters);
 void vTaskStepperMotorControl(void *pvParameters);
