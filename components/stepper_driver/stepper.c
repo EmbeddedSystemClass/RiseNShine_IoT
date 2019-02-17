@@ -15,7 +15,7 @@ static int numStepsLeft = 0;
  * are defined in stepper.h. It's on the developer to ensure
  * there's no pin conflict
  */
-void initStepperPins() 
+void stepper_initStepperPins() 
 {
     ESP_LOGI(TAG, "Stepper GPIO config");
     gpio_config_t io_conf;
@@ -32,7 +32,7 @@ void initStepperPins()
  * 
  * @param stepsnum - number of steps to add
  */
-void moveStepper(int stepsnum) 
+void stepper_moveStepper(int stepsnum) 
 {
     numStepsLeft += stepsnum;
 }
@@ -40,7 +40,7 @@ void moveStepper(int stepsnum)
 /**
  * Clears the number steps queue
  */
-void stopStepper() 
+void stepper_stopStepper() 
 {
     numStepsLeft = 0;
 }
@@ -48,7 +48,7 @@ void stopStepper()
 /**
  * Changes the direction of the current stepper direction
  */
-void changeStepperDirection() 
+void stepper_changeStepperDirection() 
 {
     cwDirection = !cwDirection;
 }
@@ -61,30 +61,6 @@ static void changePinOutputs(state_e A, state_e B, state_e C, state_e D)
     gpio_set_level(stepperPinD, D);
 }
 
-static void applyState() 
-{
-    if (numStepsLeft != 0) 
-    {
-        switch(stepperState) {
-            case stateA:
-                changePinOutputs(ON , OFF, OFF, OFF);
-                break;
-            case stateB:
-                changePinOutputs(OFF, ON , OFF, OFF);
-                break;
-            case stateC:
-                changePinOutputs(OFF, OFF, ON , OFF);
-                break;
-            case stateD:
-                changePinOutputs(OFF, OFF, OFF, ON );
-                break;
-            default:
-                changePinOutputs(OFF, OFF, OFF, OFF);
-        }
-    }
-}
-
-// @todo how to increment state stored as enums?
 static void changeState() 
 {
     if (cwDirection == CLOCKWISE) 
@@ -104,4 +80,33 @@ static void changeState()
         }
     }
 }
+
+/**
+ * Applies the new state by accessing the GPIO pins
+ */
+void stepper_applyState() 
+{
+    if (numStepsLeft != 0) 
+    {
+        switch(stepperState) {
+            case stateA:
+                changePinOutputs(ON , OFF, OFF, OFF);
+                break;
+            case stateB:
+                changePinOutputs(OFF, ON , OFF, OFF);
+                break;
+            case stateC:
+                changePinOutputs(OFF, OFF, ON , OFF);
+                break;
+            case stateD:
+                changePinOutputs(OFF, OFF, OFF, ON );
+                break;
+            default:
+                changePinOutputs(OFF, OFF, OFF, OFF);
+        }
+        changeState();
+    }
+}
+
+
 

@@ -61,7 +61,8 @@ typedef enum
     COUNTCLOCKWISE
 } state_e;
 
-void initStepperPins();
-void moveStepper(int stepsnum);
-void stopStepper();
-void changeStepperDirection();
+void stepper_initStepperPins();
+void stepper_moveStepper(int stepsnum);
+void stepper_stopStepper();
+void stepper_changeStepperDirection();
+void stepper_applyState();
