@@ -12,16 +12,16 @@
 
 void vTaskStepperMotorControl(void *pvParameters)
 {
-    initStepperPins();
+    stepper_initStepperPins();
     const TickType_t xDelayDuration = STEPPER_FREQUENCY_MS / portTICK_PERIOD_MS;
     int numStepsToAdd = 0;
     while(1) 
     {
-        if (xQueueReceive(qStepperMotorSteps,numStepsToAdd,0) == pdTRUE)
+        if (xQueueReceive(qStepperMotorSteps,&numStepsToAdd,0) == pdTRUE)
         {
             stepper_moveStepper(numStepsToAdd);
         }
-        applyState();
+        stepper_applyState();
         vTaskDelay(xDelayDuration);
     }
 }

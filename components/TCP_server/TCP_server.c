@@ -4,21 +4,7 @@
 
  #include "TCP_server.h"
 
-static const char *TAG = "TCP_Module log:";
-
-static int charToInt(char * chars, int len)
-{
-    int x;
-    int i;
-    for(i = 0; i < len; i++) 
-    {
-        if(chars[i] >= '0' && chars[i] <= '9')
-        {
-            x = x*10 + (chars[i]-'0');
-        }
-    }
-    return x;
-}
+static const char * TAG = "TCP_Module log:";
 
 bool tcp_createAndBindSocket(struct sockaddr_in *destAddr, int * listen_sock)
 {

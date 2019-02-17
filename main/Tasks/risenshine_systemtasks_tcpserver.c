@@ -10,7 +10,7 @@
 
 static int charToInt(char * chars, int len)
 {
-    int x;
+    int x = 0;
     int i;
     for(i = 0; i < len; i++) 
     {
@@ -25,7 +25,7 @@ static int charToInt(char * chars, int len)
 void processTCPCommand(char* dataBuffer, int len)
 {
     int numSteps = charToInt(dataBuffer, len);
-    xQueueSend(qStepperMotorSteps, numSteps, 0);
+    xQueueSend(qStepperMotorSteps, &numSteps, 0);
 }
 
 void vTaskTCPServer(void *pvParameters)
