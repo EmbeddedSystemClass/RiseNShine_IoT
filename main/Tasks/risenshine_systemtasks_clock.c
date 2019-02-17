@@ -9,6 +9,8 @@
 #include "esp_log.h"
 #include "clock_management.h"
 
+#define TICK_INTERVAL_MS 1000
+
 static const char* TAG = "clock_management_log";
 
 void vTaskClockSystem(void *pvParameters)
@@ -16,7 +18,7 @@ void vTaskClockSystem(void *pvParameters)
 
 	//initialization
 	ESP_LOGI(TAG, "Init of time struct");
-	const TickType_t xDelayDuration = 1000 / portTICK_PERIOD_MS;
+	const TickType_t xDelayDuration = TICK_INTERVAL_MS / portTICK_PERIOD_MS;
 	static timeFormat_t current_time;
 	static timeFormat_t sunset_time;
 	static timeFormat_t sunrise_time;
@@ -75,7 +77,5 @@ void vTaskClockSystem(void *pvParameters)
 
 		vTaskDelay(xDelayDuration); //repeat every 1 second
 	}
-
-
 	// Never gets here!
 }

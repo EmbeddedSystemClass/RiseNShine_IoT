@@ -8,6 +8,13 @@
 
 #pragma once
 
+#include "FreeRTOS.h"
+#include "freertos/queue.h"
+#include "freertos/task.h"
+
+// Queues
+QueueHandle_t qStepperMotorSteps;
+
 void vTaskClockSystem(void* pvParameters);
 void vTaskTCPServer(void* pvParameters);
 void vTaskStepperMotorControl(void *pvParameters);
