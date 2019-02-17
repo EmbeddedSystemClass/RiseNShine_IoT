@@ -6,7 +6,7 @@
 
 static const char *TAG = "TCP_Module log:";
 
-void tcp_server_task(void *pvParameters)
+void tcp_server()
 {
     char rx_buffer[128];
     char addr_str[128];
@@ -15,9 +15,6 @@ void tcp_server_task(void *pvParameters)
     int is_create_socket_success = 1;
     int is_socket_binded_success = 1;
 
-    
-
-#ifdef CONFIG_EXAMPLE_IPV4
     struct sockaddr_in destAddr;
     destAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     destAddr.sin_family = AF_INET;
@@ -25,15 +22,7 @@ void tcp_server_task(void *pvParameters)
     addr_family = AF_INET;
     ip_protocol = IPPROTO_IP;
     inet_ntoa_r(destAddr.sin_addr, addr_str, sizeof(addr_str) - 1);
-#else // IPV6
-    struct sockaddr_in6 destAddr;
-    bzero(&destAddr.sin6_addr.un, sizeof(destAddr.sin6_addr.un));
-    destAddr.sin6_family = AF_INET6;
-    destAddr.sin6_port = htons(PORT);
-    addr_family = AF_INET6;
-    ip_protocol = IPPROTO_IPV6;
-    inet6_ntoa_r(destAddr.sin6_addr, addr_str, sizeof(addr_str) - 1);
-#endif
+
 
     int listen_sock = socket(addr_family, SOCK_STREAM, ip_protocol);
     if (listen_sock < 0) {
@@ -61,11 +50,8 @@ void tcp_server_task(void *pvParameters)
         }
         ESP_LOGI(TAG, "Socket listening");
 
-#ifdef CONFIG_EXAMPLE_IPV6
-        struct sockaddr_in6 sourceAddr; // Large enough for both IPv4 or IPv6
-#else
         struct sockaddr_in sourceAddr;
-#endif
+
         uint addrLen = sizeof(sourceAddr);
         int sock = accept(listen_sock, (struct sockaddr *)&sourceAddr, &addrLen);
         if (sock < 0) {
@@ -88,17 +74,7 @@ void tcp_server_task(void *pvParameters)
             }
             // Data received
             else {
-#ifdef CONFIG_EXAMPLE_IPV6
-                // Get the sender's ip address as string
-                if (sourceAddr.sin6_family == PF_INET) {
-                    inet_ntoa_r(((struct sockaddr_in *)&sourceAddr)->sin_addr.s_addr, addr_str, sizeof(addr_str) - 1);
-                } else if (sourceAddr.sin6_family == PF_INET6) {
-                    inet6_ntoa_r(sourceAddr.sin6_addr, addr_str, sizeof(addr_str) - 1);
-                }
-#else
                 inet_ntoa_r(((struct sockaddr_in *)&sourceAddr)->sin_addr.s_addr, addr_str, sizeof(addr_str) - 1);
-#endif
-
                 rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string
                 ESP_LOGI(TAG, "Received %d bytes from %s:", len, addr_str);
                 ESP_LOGI(TAG, "%s", rx_buffer);
@@ -117,5 +93,4 @@ void tcp_server_task(void *pvParameters)
             close(sock);
         }
     }
-    vTaskDelete(NULL);
 }

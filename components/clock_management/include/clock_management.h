@@ -8,6 +8,8 @@ This module contains the hardware timer used to keep track of the system time us
 
 */
 
+#pragma once
+
 #include "esp_system.h"
 #include "esp_log.h"
 #include "driver/gpio.h"
@@ -19,7 +21,7 @@ This module contains the hardware timer used to keep track of the system time us
 #define GPIO_LED_OUTPUT_IO 2 //pin 2 - built in LED on NodeMCU
 #define GPIO_OUTPUT_BITMASK (1ULL << GPIO_LED_OUTPUT_IO)
 
-typedef struct stime_t {
+typedef struct {
 	unsigned int hour;
 	unsigned int minute;
 	unsigned int second;

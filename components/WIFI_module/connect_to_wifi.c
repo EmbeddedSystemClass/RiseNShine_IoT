@@ -1,25 +1,12 @@
 /**
- * connect_to_wifi.h
+ * connect_to_wifi.c
+ * 
  */
 
-#include <string.h>
-#include <sys/param.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "esp_event_loop.h"
-#include "esp_log.h"
+#include "connect_to_wifi.h"
 
-const int IPV4_GOTIP_BIT = BIT0;
-#ifdef CONFIG_EXAMPLE_IPV6
-const int IPV6_GOTIP_BIT = BIT1;
-#endif
 
-#define EXAMPLE_WIFI_SSID CONFIG_WIFI_SSID
-#define EXAMPLE_WIFI_PASS CONFIG_WIFI_PASSWORD
-
+static const int WIFI_GOTIP_BIT = BIT0;
 static const char *TAG = "Connect_to_wifi log:";
 
 static EventGroupHandle_t wifi_event_group;
@@ -32,31 +19,18 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
         ESP_LOGI(TAG, "SYSTEM_EVENT_STA_START");
         break;
     case SYSTEM_EVENT_STA_CONNECTED:
-#ifdef CONFIG_EXAMPLE_IPV6
-        /* enable ipv6 */
-        tcpip_adapter_create_ip6_linklocal(TCPIP_ADAPTER_IF_STA);
-#endif
         break;
     case SYSTEM_EVENT_STA_GOT_IP:
-        xEventGroupSetBits(wifi_event_group, IPV4_GOTIP_BIT);
+        xEventGroupSetBits(wifi_event_group, WIFI_GOTIP_BIT);
         ESP_LOGI(TAG, "SYSTEM_EVENT_STA_GOT_IP");
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
         /* This is a workaround as ESP32 WiFi libs don't currently auto-reassociate. */
         esp_wifi_connect();
-        xEventGroupClearBits(wifi_event_group, IPV4_GOTIP_BIT);
-#ifdef CONFIG_EXAMPLE_IPV6
-        xEventGroupClearBits(wifi_event_group, IPV6_GOTIP_BIT);
-#endif
+        xEventGroupClearBits(wifi_event_group, WIFI_GOTIP_BIT);
         break;
     case SYSTEM_EVENT_AP_STA_GOT_IP6:
-#ifdef CONFIG_EXAMPLE_IPV6
-        xEventGroupSetBits(wifi_event_group, IPV6_GOTIP_BIT);
-        ESP_LOGI(TAG, "SYSTEM_EVENT_STA_GOT_IP6");
-
-        char *ip6 = ip6addr_ntoa(&event->event_info.got_ip6.ip6_info.ip);
-        ESP_LOGI(TAG, "IPv6: %s", ip6);
-#endif
+        break;
     default:
         break;
     }
@@ -85,11 +59,7 @@ void initialise_wifi(void)
 
 void wait_for_ip()
 {
-#ifdef CONFIG_EXAMPLE_IPV6
-    uint32_t bits = IPV4_GOTIP_BIT | IPV6_GOTIP_BIT;
-#else
-    uint32_t bits = IPV4_GOTIP_BIT;
-#endif
+    uint32_t bits = WIFI_GOTIP_BIT;
 
     ESP_LOGI(TAG, "Waiting for AP connection...");
     xEventGroupWaitBits(wifi_event_group, bits, false, true, portMAX_DELAY);
