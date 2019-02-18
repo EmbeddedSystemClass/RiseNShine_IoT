@@ -22,5 +22,5 @@
 
 #define PORT CONFIG_EXAMPLE_PORT
 
-bool tcp_createAndBindSocket(struct sockaddr_in *destAddr, int * listen_sock);
+bool tcp_createAndBindSocket(int * listen_sock);
 void tcp_acceptClients(int listen_sock, void (*callback_ptr)(char* buffer, int len) );
