@@ -10,7 +10,7 @@
 
 #include "esp_log.h"
 
-const char * TAG = "TCP task";
+static const char * TAG = "TCP task";
 
 static int charToInt(char * chars, int len)
 {

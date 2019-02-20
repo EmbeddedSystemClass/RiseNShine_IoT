@@ -80,6 +80,7 @@ void tcp_acceptClients(int listen_sock, void (*callback_ptr)(char* buffer, int l
                 ESP_LOGI(TAG, "Received %d bytes from %s:", len, addr_str);
                 ESP_LOGI(TAG, "%s", rx_buffer);
 
+                // Process the received data using the callback function
                 (*callback_ptr)(rx_buffer, len);
                 int err = send(sock, rx_buffer, len, 0);
                 if (err < 0) {
