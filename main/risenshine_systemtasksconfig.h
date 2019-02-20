@@ -13,11 +13,13 @@
 #define CLOCK_MANAGEMENT_PRIORITY 10
 #define TCP_SERVER_PRIORITY 9
 #define STEPPER_CONTROL_PRIORITY 8
+#define BACKGROUND_TASKS_PRIORITY 4
 
 // Stack size config
 #define CLOCK_MANAGEMENT_STACKSIZE 2048
 #define TCP_SERVER_STACKSIZE 4096
 #define STEPPER_CONTROL_STACKSIZE 2048
+#define BACKGROUND_TASKS_STACKSIZE 4096
 
 
 /***************************/
@@ -76,6 +78,15 @@ TaskParametersList_t s_StepperControlTask = {
     .sizeOfStackinWords=  STEPPER_CONTROL_STACKSIZE,
     .pvTaskParameters=    NULL,
     .uxPriority=          STEPPER_CONTROL_PRIORITY,
+    .pxCreatedTask=       NULL  
+};
+
+TaskParametersList_t s_IdleComputationTask = { 
+    .functionCall=        vTaskIdleComputations,
+    .taskName=            "Idle Computations",
+    .sizeOfStackinWords=  BACKGROUND_TASKS_STACKSIZE,
+    .pvTaskParameters=    NULL,
+    .uxPriority=          BACKGROUND_TASKS_PRIORITY,
     .pxCreatedTask=       NULL  
 };
 

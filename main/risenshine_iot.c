@@ -16,4 +16,5 @@ void app_main()
     xTaskCreate_wrapper(s_clockMgtTask);
     xTaskCreate_wrapper(s_TCPServerTask);
     xTaskCreate_wrapper(s_StepperControlTask);
+    xTaskCreate_wrapper(s_IdleComputationTask);
 }
