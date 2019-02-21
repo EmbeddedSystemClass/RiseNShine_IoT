@@ -68,6 +68,21 @@ static char * getHTMLContent(char * data)
     return strstr(data, "\r\n\r\n");
 }
 
+static timePackage_t createPackage(timeType_e type, timeFormat_t time)
+{
+    timePackage_t package = {
+        .timeType = type,
+        .timeData = time
+    };
+    return package;
+}
+
+static void sendDataToQueue(strSunriseSunsetTimes_t * data)
+{
+    timePackage_t package = createPackage(sunriseTime, data->sunriseTime);
+    
+}
+
 void vTaskIdleComputations(void *pvParameters)
 {
     char payload[PAYLOADSIZE];
@@ -100,6 +115,7 @@ void vTaskIdleComputations(void *pvParameters)
             ESP_LOGE(TAG, "Parsing failed!");
         }
 
+        sendDataToQueue(&dataHolder);
         vTaskDelay(30000 / portTICK_PERIOD_MS);
     }
     

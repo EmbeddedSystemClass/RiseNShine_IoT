@@ -37,7 +37,7 @@ void vTaskTCPServer(void *pvParameters)
 {
     int socketfd;
 
-    qStepperMotorSteps = xQueueCreate(2, sizeof(int));
+    //qStepperMotorSteps = xQueueCreate(2, sizeof(int));
     if(tcp_createAndBindSocket(&socketfd))
     {
         tcp_acceptClients(socketfd, &processTCPCommand);

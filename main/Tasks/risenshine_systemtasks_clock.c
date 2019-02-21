@@ -50,7 +50,7 @@ void vTaskClockSystem(void *pvParameters)
 		//gpio_set_level(GPIO_LED_OUTPUT_IO, ++cnt % 2);
 		//ESP_LOGI(TAG, "Current time: %d:%d:%d", current_time.hour, current_time.minute,current_time.second);
 
-
+		//check every minute
 		if(current_time.second == 0)
 		{
 			if(compare_time(&current_time, &sunrise_time) == 1)
@@ -59,6 +59,7 @@ void vTaskClockSystem(void *pvParameters)
 			}
 		}
 		
+		//check every minute
 		if(current_time.second == 30) 
 		{
 			if(compare_time(&current_time, &sunset_time) == 1)

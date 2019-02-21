@@ -82,18 +82,9 @@ void http_sendRequest(int s, char payload[], int payloadSize)
     /* Read HTTP response */
     // clear buffer first
     memset(payload, 0, payloadSize);
-    do {
-        memset(recv_buffer, 0, sizeof(recv_buffer));
-        nRead = read(s, payload, payloadSize-1);
-        for(int i = 0; i < nRead; i++)
-        {
+    nRead = read(s, payload, payloadSize-1);
 
-        }
-    } while (nRead > 0);
-    
-    
-
-    if (nRead > 0) {
+    if (nRead < 0) {
         ESP_LOGE(TAG, "Error! Buffer not large enough to store payload.");
         close(s);
         return;
