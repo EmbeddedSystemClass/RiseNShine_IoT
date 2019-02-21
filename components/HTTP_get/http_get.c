@@ -18,9 +18,7 @@ int http_connectSocket()
         .ai_socktype = SOCK_STREAM,
     };
     struct addrinfo *res;
-    struct in_addr *addr;
-    int s;
-    char recvBuffer[64];
+    int s = -1;
     char addr_str[128];
 
 
@@ -28,7 +26,7 @@ int http_connectSocket()
 
     if(err != 0 || res == NULL) {
         ESP_LOGE(TAG, "DNS lookup failed err=%d res=%p", err, res);
-        return;
+        return -1;
     }
 
     /* Code to print the resolved IP.*/
@@ -39,7 +37,7 @@ int http_connectSocket()
     if(s < 0) {
         ESP_LOGE(TAG, "Failed to allocate socket.");
         freeaddrinfo(res);
-        return;
+        return -1;
     }
     ESP_LOGI(TAG, "allocated socket");
 
@@ -47,7 +45,7 @@ int http_connectSocket()
         ESP_LOGE(TAG, "socket connect failed errno=%d", errno);
         close(s);
         freeaddrinfo(res);
-        return;
+        return -1;
     }
 
     ESP_LOGI(TAG, "connected");
@@ -56,10 +54,11 @@ int http_connectSocket()
     return s;
 }
 
-void http_sendRequest(int s)
+void http_sendRequest(int s, char payload[], int payloadSize)
 {
-    char payload[1048];
     int nRead;
+    char recv_buffer[128];
+    int cursor = 0;
 
 
     if (write(s, REQUEST, strlen(REQUEST)) < 0) {
@@ -82,17 +81,24 @@ void http_sendRequest(int s)
 
     /* Read HTTP response */
     // clear buffer first
-    memset(payload, 0, sizeof(recvBuffer));
-    nRead = read(s, payload, sizeof(payload)-1);
+    memset(payload, 0, payloadSize);
+    do {
+        memset(recv_buffer, 0, sizeof(recv_buffer));
+        nRead = read(s, payload, payloadSize-1);
+        for(int i = 0; i < nRead; i++)
+        {
+
+        }
+    } while (nRead > 0);
+    
+    
 
     if (nRead > 0) {
         ESP_LOGE(TAG, "Error! Buffer not large enough to store payload.");
         close(s);
         return;
     }
-    
 
-
-    ESP_LOGI(TAG, "done reading from socket. Last read return=%d errno=%d\r\n", r, errno);
+    ESP_LOGI(TAG, "done reading from socket. Last read return=%d errno=%d", nRead, errno);
     close(s);
 }
