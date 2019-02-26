@@ -40,6 +40,7 @@ void vTaskClockSystem(void *pvParameters)
     gpio_config(&io_conf);
 	gpio_set_level(GPIO_LED_OUTPUT_IO, 0); //only visual indication that wifi is ready
 
+	timePackage_t recvTimePackage;
 	//int cnt = 0;
 
 	ESP_LOGI(TAG, "Start Task");
@@ -48,7 +49,7 @@ void vTaskClockSystem(void *pvParameters)
 	{
 		increment_time(&current_time);
 		//gpio_set_level(GPIO_LED_OUTPUT_IO, ++cnt % 2);
-		//ESP_LOGI(TAG, "Current time: %d:%d:%d", current_time.hour, current_time.minute,current_time.second);
+		ESP_LOGI(TAG, "Current time: %d:%d:%d", current_time.hour, current_time.minute,current_time.second);
 
 		//check every minute
 		if(current_time.second == 0)
@@ -70,12 +71,22 @@ void vTaskClockSystem(void *pvParameters)
 
 
 		//check q to see if current time has a new update
-		/*if ( xQueueReceive( asdf ))
+		if ( xQueueReceive(qClockUpdate, &recvTimePackage, 0))
 		{
-			set_time(current_time, asdf)
-		}*/
-
-
+			switch(recvTimePackage.timeType)
+			{
+				case sunsetTime:
+					set_time(&sunset_time, recvTimePackage.timeData.hour, recvTimePackage.timeData.minute, recvTimePackage.timeData.second);
+					break;
+				case sunriseTime:
+					set_time(&sunrise_time, recvTimePackage.timeData.hour, recvTimePackage.timeData.minute, recvTimePackage.timeData.second);
+					break;
+				default:
+					ESP_LOGE(TAG, "Error! Can not find correct time type");
+					break;
+			}
+		}
+		
 		vTaskDelay(xDelayDuration); //repeat every 1 second
 	}
 	// Never gets here!

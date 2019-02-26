@@ -80,7 +80,10 @@ static timePackage_t createPackage(timeType_e type, timeFormat_t time)
 static void sendDataToQueue(strSunriseSunsetTimes_t * data)
 {
     timePackage_t package = createPackage(sunriseTime, data->sunriseTime);
-    
+    xQueueSend(qClockUpdate, &package, 0);
+
+    package = createPackage(sunsetTime, data->sunsetTime);
+    xQueueSend(qClockUpdate, &package, 0);
 }
 
 void vTaskIdleComputations(void *pvParameters)
