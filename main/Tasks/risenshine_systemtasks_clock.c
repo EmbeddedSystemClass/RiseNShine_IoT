@@ -49,7 +49,7 @@ void vTaskClockSystem(void *pvParameters)
 	{
 		increment_time(&current_time);
 		//gpio_set_level(GPIO_LED_OUTPUT_IO, ++cnt % 2);
-		ESP_LOGI(TAG, "Current time: %d:%d:%d", current_time.hour, current_time.minute,current_time.second);
+		//ESP_LOGI(TAG, "Current time: %d:%d:%d", current_time.hour, current_time.minute,current_time.second);
 
 		//check every minute
 		if(current_time.second == 0)
@@ -83,6 +83,7 @@ void vTaskClockSystem(void *pvParameters)
 					break;
 				case currentTime:
 					set_time(&current_time, recvTimePackage.timeData.hour, recvTimePackage.timeData.minute, recvTimePackage.timeData.second);
+					ESP_LOGI(TAG, "New current time: %d:%d:%d", current_time.hour, current_time.minute, current_time.second);
 					break;
 				default:
 					ESP_LOGE(TAG, "Error! Can not find correct time type");

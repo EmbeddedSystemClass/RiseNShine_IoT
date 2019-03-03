@@ -38,31 +38,43 @@ int udp_getUDPsocket()
         return -1;
     }
     ESP_LOGI(TAG, "Socket created");
+
+    //set recv socket as non-blocking
+    fcntl(sock, F_SETFL, O_NONBLOCK);
+
+    err = connect(sock, res->ai_addr, res->ai_addrlen);
+    if (err == -1)
+    {
+        ESP_LOGE(TAG, "Error connecting to server");
+        freeaddrinfo(res);
+        close(sock);
+        return -1;
+    }
+
     freeaddrinfo(res);
 
     return sock;
 }
 
-void udp_sendMsg(int sock, void(*callback_ptr)(uint32_t *data))
+void udp_sendMsg(int sock)
 {
     ntp_packet_t payload;
     memset(&payload, 0, sizeof(payload));
     payload.li_vn_mode = 0xE3;
 
-    int err = sendto(sock, &payload, sizeof(payload), 0, res->ai_addr, res->ai_addrlen);
+    int err = send(sock, &payload, sizeof(payload), 0);
     if (err < 0) {
         ESP_LOGE(TAG, "Error occured during sending: errno %d", errno);
         return;
     }
     ESP_LOGI(TAG, "Message sent");
+}
 
+void udp_recvMsg(int sock, void(*callback_ptr)(uint32_t *data))
+{
     ntp_packet_t recv_buffer;
     memset(&recv_buffer, 0, sizeof(recv_buffer));
-    struct sockaddr_in sourceAddr; // Large enough for both IPv4 or IPv6
-    socklen_t socklen = sizeof(sourceAddr);
-    int len = recvfrom(sock, &recv_buffer, sizeof(recv_buffer), 0, (struct sockaddr *)&sourceAddr, &socklen);
-    inet_ntoa_r(sourceAddr.sin_addr.s_addr, addr_str, sizeof(addr_str) - 1);
-
+    int len = recv(sock, &recv_buffer, sizeof(recv_buffer), 0);
 
     // Error occured during receiving
     if (len < 0) {
@@ -72,12 +84,12 @@ void udp_sendMsg(int sock, void(*callback_ptr)(uint32_t *data))
     // Data received
     else {
         uint32_t recvTime = ntohl(recv_buffer.txTm_s);
-        (*callback_ptr)(recvTime);
-        ESP_LOGI(TAG, "Received %d bytes from %s:", len, addr_str);
+        (*callback_ptr)(&recvTime);
+        ESP_LOGI(TAG, "Received %d bytes", len);
     }
 
     if (sock != -1) {
-        ESP_LOGE(TAG, "Shutting down socket and restarting...");
+        ESP_LOGI(TAG, "Shutting down socket and restarting...");
         shutdown(sock, 0);
         close(sock);
     }

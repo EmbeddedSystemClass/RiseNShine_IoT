@@ -7,6 +7,7 @@
 #include "risenshine_systemtasks.h"
 
 #include "http_get.h"
+#include "get_NTP.h"
 
 #include "esp_log.h"
 
@@ -88,15 +89,16 @@ static void sendDataToQueue(strSunriseSunsetTimes_t * data)
     xQueueSend(qClockUpdate, &package, 0);
 }
 
-static void processNTPResult(uint32_t *data)
+void processNTPResult(uint32_t *data)
 {
     uint32_t convertedTime = *data - BASELINETIME - LOCALTIME;
+    ESP_LOGI(TAG, "Received UNIX time: %d", convertedTime);
     timePackage_t package = {
         .timeType = currentTime,
-        .timeData.hour = convertedTime / 3600 % 24;
-        .timeData.minute = convertedTime / 60 % 60;
-        .timeData.second = convertedTime % 60;
-    }
+        .timeData.hour = convertedTime / 3600 % 24,
+        .timeData.minute = convertedTime / 60 % 60,
+        .timeData.second = convertedTime % 60
+    };
     xQueueSend(qClockUpdate, &package, 0);
 }
 
@@ -108,7 +110,6 @@ void vTaskIdleComputations(void *pvParameters)
     int udpSocket = -1;
     strSunriseSunsetTimes_t dataHolder;
     bool parseSuccess = false;
-    uint32_t data;
  
     while(1)
     {
@@ -137,7 +138,9 @@ void vTaskIdleComputations(void *pvParameters)
         sendDataToQueue(&dataHolder);
 
         udpSocket = udp_getUDPsocket();
-        udp_sendMsg(udpSocket, &processNTPResult);
+        udp_sendMsg(udpSocket);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        udp_recvMsg(udpSocket, &processNTPResult);
 
         vTaskDelay(30000 / portTICK_PERIOD_MS);
     }

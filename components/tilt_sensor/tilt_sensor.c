@@ -35,6 +35,8 @@ gpio_level_t tiltsens_getSensor1Level()
             return GPIO_LEVEL_LOW;
         case 1:
             return GPIO_LEVEL_HIGH;
+        default:
+            return GPIO_LEVEL_LOW;
     }
 }
 
@@ -47,5 +49,7 @@ gpio_level_t tiltsens_getSensor2Level()
             return GPIO_LEVEL_LOW;
         case 1:
             return GPIO_LEVEL_HIGH;
+        default:
+            return GPIO_LEVEL_LOW;
     }
 }

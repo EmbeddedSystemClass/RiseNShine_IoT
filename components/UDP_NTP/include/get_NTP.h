@@ -6,16 +6,7 @@
 #pragma once
 
 #include <string.h>
-#include <sys/param.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "esp_event_loop.h"
 #include "esp_log.h"
-#include "nvs_flash.h"
-
 #include "lwip/err.h"
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
@@ -51,4 +42,5 @@ typedef struct {
 } ntp_packet_t;
 
 int udp_getUDPsocket();
-void udp_sendMsg(int sock, void(*call_back_ptr)(uint32_t *data));
+void udp_sendMsg(int sock);
+void udp_recvMsg(int sock, void(*call_back_ptr)(uint32_t *data));
