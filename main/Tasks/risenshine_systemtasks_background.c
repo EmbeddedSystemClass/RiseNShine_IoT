@@ -102,6 +102,19 @@ void processNTPResult(uint32_t *data)
     xQueueSend(qClockUpdate, &package, 0);
 }
 
+static void convertToLocalTime(timeFormat_t *data)
+{
+    const int hourDiff = 8;
+    if (data->hour < 8)
+    {
+        data->hour = data->hour + 24 - hourDiff;
+    }
+    else
+    {
+        data->hour -= 8;
+    }
+}
+
 void vTaskIdleComputations(void *pvParameters)
 {
     char payload[PAYLOADSIZE];
@@ -127,6 +140,8 @@ void vTaskIdleComputations(void *pvParameters)
         parseSuccess = parseSunriseSunsetJSON(htmlContent, &dataHolder);
         if (parseSuccess)
         {
+            convertToLocalTime(&(dataHolder.sunriseTime));
+            convertToLocalTime(&(dataHolder.sunsetTime));
             ESP_LOGI(TAG, "Sunrise time: %u:%u:%u", dataHolder.sunriseTime.hour, dataHolder.sunriseTime.minute, dataHolder.sunriseTime.second);
             ESP_LOGI(TAG, "Sunset time: %u:%u:%u", dataHolder.sunsetTime.hour, dataHolder.sunsetTime.minute, dataHolder.sunsetTime.second);
         }
