@@ -81,6 +81,9 @@ void vTaskClockSystem(void *pvParameters)
 				case sunriseTime:
 					set_time(&sunrise_time, recvTimePackage.timeData.hour, recvTimePackage.timeData.minute, recvTimePackage.timeData.second);
 					break;
+				case currentTime:
+					set_time(&current_time, recvTimePackage.timeData.hour, recvTimePackage.timeData.minute, recvTimePackage.timeData.second);
+					break;
 				default:
 					ESP_LOGE(TAG, "Error! Can not find correct time type");
 					break;

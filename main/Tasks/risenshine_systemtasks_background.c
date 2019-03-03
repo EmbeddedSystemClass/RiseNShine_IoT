@@ -13,6 +13,8 @@
 static const char * TAG = "Background task";
 
 #define PAYLOADSIZE 1024
+#define BASELINETIME 2208988800UL
+#define LOCALTIME 28800UL
 
 static bool parseSunriseSunsetJSON(const char * const data, strSunriseSunsetTimes_t * dataHolder)
 {
@@ -86,18 +88,32 @@ static void sendDataToQueue(strSunriseSunsetTimes_t * data)
     xQueueSend(qClockUpdate, &package, 0);
 }
 
+static void processNTPResult(uint32_t *data)
+{
+    uint32_t convertedTime = *data - BASELINETIME - LOCALTIME;
+    timePackage_t package = {
+        .timeType = currentTime,
+        .timeData.hour = convertedTime / 3600 % 24;
+        .timeData.minute = convertedTime / 60 % 60;
+        .timeData.second = convertedTime % 60;
+    }
+    xQueueSend(qClockUpdate, &package, 0);
+}
+
 void vTaskIdleComputations(void *pvParameters)
 {
     char payload[PAYLOADSIZE];
     char * htmlContent = NULL;
-    int socket = -1;
+    int httpSocket = -1;
+    int udpSocket = -1;
     strSunriseSunsetTimes_t dataHolder;
     bool parseSuccess = false;
+    uint32_t data;
  
     while(1)
     {
-        socket = http_connectSocket();
-        http_sendRequest(socket, payload, PAYLOADSIZE);
+        httpSocket = http_connectSocket();
+        http_sendRequest(httpSocket, payload, PAYLOADSIZE);
 
         //remove header from content
         htmlContent = getHTMLContent(payload);
@@ -119,6 +135,10 @@ void vTaskIdleComputations(void *pvParameters)
         }
 
         sendDataToQueue(&dataHolder);
+
+        udpSocket = udp_getUDPsocket();
+        udp_sendMsg(udpSocket, &processNTPResult);
+
         vTaskDelay(30000 / portTICK_PERIOD_MS);
     }
     
