@@ -6,7 +6,7 @@
 #include "stepper.h"
 
 static char* TAG = "stepper_log_c";
-static state_e cwDirection = CLOCKWISE;
+static stepperState_e cwDirection = CLOCKWISE;
 static int stepperState = (int)stateA;
 static uint numStepsLeft = 0;
 
@@ -46,6 +46,30 @@ void stepper_stopStepper()
 }
 
 /**
+ * Set the direction of the stepper
+ * 
+ * @return If valid direction, returns true
+ *         else, false
+ */
+bool stepper_setStepperDirection(stepperState_e newDirection)
+{
+    switch (newDirection)
+    {
+        case CLOCKWISE:
+            cwDirection = CLOCKWISE;
+            return true;
+            break;
+        case COUNTCLOCKWISE:
+            cwDirection = COUNTCLOCKWISE;
+            return true;
+            break;
+        default:
+            return false;
+            break;
+    }
+}
+
+/**
  * Changes the direction of the current stepper direction
  */
 void stepper_changeStepperDirection() 
@@ -53,7 +77,7 @@ void stepper_changeStepperDirection()
     cwDirection = !cwDirection;
 }
 
-static void changePinOutputs(state_e A, state_e B, state_e C, state_e D) 
+static void changePinOutputs(stepperState_e A, stepperState_e B, stepperState_e C, stepperState_e D) 
 {
     gpio_set_level(stepperPinA, A);
     gpio_set_level(stepperPinB, B);

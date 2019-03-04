@@ -59,10 +59,11 @@ typedef enum
     //for direction
     CLOCKWISE = 0,
     COUNTCLOCKWISE
-} state_e;
+} stepperState_e;
 
 void stepper_initStepperPins();
 void stepper_moveStepper(int stepsnum);
 void stepper_stopStepper();
+bool stepper_setStepperDirection(stepperState_e dir);
 void stepper_changeStepperDirection();
 void stepper_applyState();

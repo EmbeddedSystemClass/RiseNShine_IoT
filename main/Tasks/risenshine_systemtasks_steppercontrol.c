@@ -11,6 +11,24 @@
 
 #define STEPPER_FREQUENCY_uS 10000 // 100 Hz = 1 / 10000 us
 #define TIMER_AUTORELOAD_TRUE true
+#define BLINDSNUMSTEPS 3000
+
+static bool isBlindsOpen = false;
+
+static void openBlinds()
+{
+    if(!isBlindsOpen) 
+    {
+        stepper_setStepperDirection(CLOCKWISE);
+        stepper_moveStepper()
+    }
+}
+
+static void initializeBlindsPosition()
+{
+    stepper_setStepperDirection(COUNTCLOCKWISE);
+
+}
 
 void vTaskStepperMotorControl(void *pvParameters)
 {
