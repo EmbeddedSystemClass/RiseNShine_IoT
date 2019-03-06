@@ -71,16 +71,16 @@ static char * getHTMLContent(char * data)
     return strstr(data, "\r\n\r\n");
 }
 
-static timePackage_t createPackage(timeType_e type, timeFormat_t time)
+static timePackage_t createPackage(timeType_e type, timeFormat_t *time)
 {
     timePackage_t package = {
         .timeType = type,
-        .timeData = time
+        .timeData = *time
     };
     return package;
 }
 
-static void sendDataToQueue(strSunriseSunsetTimes_t * data)
+static void sendTimeDataToQueue(timeType_e type, timeFormat_t * data)
 {
     timePackage_t package = createPackage(sunriseTime, data->sunriseTime);
     xQueueSend(qClockUpdate, &package, 0);
