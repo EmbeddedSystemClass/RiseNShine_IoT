@@ -1,12 +1,6 @@
 /* User GUI over TCP */
 
-typedef enum {
-    USRCMD_GOTOMAINMENU = 0,
-    USRCMD_SETDIRECTION,
-    USRCMD_STOPSTEPPER,
-    USRCMD_ADDDIRECTION,
-    USRCMD_INVALID
-} userCommands_e;
+#include "gui_user.h"
 
 void gui_processInput(userCommands_e cmd)
 {
@@ -25,4 +19,15 @@ void gui_processInput(userCommands_e cmd)
         default:
             break;
     }
+}
+
+void gui_printMenu()
+{
+    char menu[] =  "=================MENU==============/n"
+                   "  (1) OPTION 1                     /n"
+                   "  (2) OPTION 2                     /n"
+                   "  (3) OPTION 3                     /n"
+                   "  (4) OPTION 4                     /n"
+                   "  (x) EXIT                         /n"
+                   "===================================";     
 }

@@ -21,9 +21,10 @@
 #include <lwip/netdb.h>
 
 #define PORT CONFIG_EXAMPLE_PORT
+#define TCP_INVALIDSOCKET -1
 
 bool tcp_createAndBindSocket(int * listen_sock);
-bool tcp_acceptClients(int listen_sock);
+int  tcp_acceptClients(int listen_sock);
 bool tcp_sendMessage(int socket, char* payload, uint32_t len);
 bool tcp_recvMessage(int socket, char* msgBuffer, uint32_t msgBufferSize);
 bool tcp_closeSocket(int socket);
