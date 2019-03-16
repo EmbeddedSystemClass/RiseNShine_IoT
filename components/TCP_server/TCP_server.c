@@ -26,7 +26,7 @@ bool tcp_createAndBindSocket(int * const listen_sock)
     ESP_LOGI(TAG, "Socket created");
 
     // Bind the socket to the port
-    int err = -1;
+    int err = TCP_INVALIDSOCKET;
     err = bind(*listen_sock, (struct sockaddr *)&destAddr, sizeof(destAddr));
     if (err != 0) {
         ESP_LOGE(TAG, "Socket unable to bind: errno %d", errno);
@@ -37,14 +37,12 @@ bool tcp_createAndBindSocket(int * const listen_sock)
     return true;
 }
 
-bool tcp_acceptClients(int listen_sock)
+int tcp_acceptClients(int listen_sock)
 {
-    char addr_str[128];
-
     int err = listen(listen_sock, 1);
     if (err != 0) {
         ESP_LOGE(TAG, "Error occured during listen: errno %d", errno);
-        return false;
+        return TCP_INVALIDSOCKET;
     }
     ESP_LOGI(TAG, "Socket listening");
 
@@ -54,11 +52,11 @@ bool tcp_acceptClients(int listen_sock)
     int sock = accept(listen_sock, (struct sockaddr *)&sourceAddr, &addrLen);
     if (sock < 0) {
         ESP_LOGE(TAG, "Unable to accept connection: errno %d", errno);
-        return false;
+        return TCP_INVALIDSOCKET;
     }
     ESP_LOGI(TAG, "Socket accepted");
 
-    return true;
+    return sock;
 }
 
         
@@ -84,42 +82,33 @@ bool tcp_recvMessage(int socket, char* msgBuffer, uint32_t msgBufferSize)
     char rxBuffer[rxBufferSize];
     char addr_str[128];
     uint32_t nWritten = 0;
+    struct sockaddr_in sourceAddr;
 
+    int bytesRecv = recv(socket, rxBuffer, rxBufferSize - 1, 0);
 
-    while (nWritten < msgBufferSize)
-    {
-        uint32_t blocksize = returnMinSize(msgBufferSize - nWritten, rxBufferSize);
-        uint32_t bytesRecv = recv(socket, rxBuffer, rxBufferSize - 1, 0);
+    inet_ntoa_r(((struct sockaddr_in *)&sourceAddr)->sin_addr.s_addr, addr_str, sizeof(addr_str) - 1);
+    ESP_LOGI(TAG, "Received %d bytes from %s:", bytesRecv, addr_str);
+    ESP_LOGI(TAG, "%s", rxBuffer);
 
-        inet_ntoa_r(((struct sockaddr_in *)&sourceAddr)->sin_addr.s_addr, addr_str, sizeof(addr_str) - 1);
-        ESP_LOGI(TAG, "Received %d bytes from %s:", bytesRecv, addr_str);
-        ESP_LOGI(TAG, "%s", rxBuffer);
-
-        // Error occured during receiving
-        if (bytesRecv < 0) {
-            ESP_LOGE(TAG, "recv failed: errno %d", errno);
-            return false;
-        }
-        memcpy(msgBuffer+nWritten, rxBuffer, blocksize);
-        nWritten+=blocksize;
+    if (bytesRecv < 0) {
+        ESP_LOGE(TAG, "recv failed: errno %d", errno);
+        return -1;
     }
-    if(nWritten >= msgBufferSize)
-    {
-        *(msgBuffer+nWritten-1) = 0;
+    else if (bytesRecv == 0) {
+        ESP_LOGI(TAG, "Connection closed");
+        return 0;
     }
-    else 
-    {
-        *(msgBuffer+nWritten) = 0;
-    }
+    memcpy(msgBuffer, rxBuffer, bytesRecv);
+    msgBuffer[bytesRecv] = 0;
 
-    return true;
+    return bytesRecv;
 }
 
 bool tcp_closeSocket(int socket)
 {
     bool status = false;
 
-    if (socket != -1) {
+    if (socket != TCP_INVALIDSOCKET) {
         ESP_LOGE(TAG, "Shutting down socket and restarting...");
         shutdown(socket, 0);
         close(socket);

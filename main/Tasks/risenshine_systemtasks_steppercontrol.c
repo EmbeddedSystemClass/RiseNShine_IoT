@@ -20,7 +20,7 @@ static void openBlinds()
     if(!isBlindsOpen) 
     {
         stepper_setStepperDirection(CLOCKWISE);
-        stepper_moveStepper()
+        stepper_moveStepper(4096);
     }
 }
 

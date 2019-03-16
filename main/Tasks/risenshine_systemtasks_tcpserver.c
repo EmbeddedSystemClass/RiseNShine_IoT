@@ -33,20 +33,28 @@ void processTCPCommand(char* dataBuffer, int len)
     xQueueSend(qStepperMotorSteps, &numSteps, 0);
 }
 
+static void handleNewClient(int socket)
+{
+    char msgPayload[512];
+    int msgLenBytes;
+    
+    do
+    {
+        msgLenBytes = tcp_recvMessage(socket, msgPayload, sizeof(msgPayload));
+        tcp_sendMessage(socket, msgPayload, msgLenBytes);
+    } while (msgLenBytes > 0);
+}
+
 void vTaskTCPServer(void *pvParameters)
 {
     int socketfd;
+    int newSocket = TCP_INVALIDSOCKET;
 
-    //qStepperMotorSteps = xQueueCreate(2, sizeof(int));
-    if(tcp_createAndBindSocket(&socketfd))
+    tcp_createAndBindSocket(&socketfd);
+    while(1) 
     {
-        tcp_acceptClients(socketfd, &processTCPCommand);
+        newSocket = tcp_acceptClients(socketfd);
+        handleNewClient(newSocket);
+        tcp_closeSocket(newSocket);
     }
-    else
-    {
-        vTaskDelete(NULL);
-        /* code */
-    }
-    
-    
 }

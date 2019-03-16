@@ -15,7 +15,7 @@ static const char * TAG = "Background task";
 
 #define PAYLOADSIZE 1024
 #define BASELINETIME 2208988800UL
-#define LOCALTIME 28800UL
+#define LOCALTIME 25200UL
 
 static bool parseSunriseSunsetJSON(const char * const data, strSunriseSunsetTimes_t * dataHolder)
 {
@@ -82,10 +82,10 @@ static timePackage_t createPackage(timeType_e type, timeFormat_t *time)
 
 static void sendTimeDataToQueue(timeType_e type, timeFormat_t * data)
 {
-    timePackage_t package = createPackage(sunriseTime, data->sunriseTime);
+    timePackage_t package = createPackage(sunriseTime, data);
     xQueueSend(qClockUpdate, &package, 0);
 
-    package = createPackage(sunsetTime, data->sunsetTime);
+    package = createPackage(sunsetTime, data);
     xQueueSend(qClockUpdate, &package, 0);
 }
 
@@ -104,14 +104,14 @@ void processNTPResult(uint32_t *data)
 
 static void convertToLocalTime(timeFormat_t *data)
 {
-    const int hourDiff = 8;
-    if (data->hour < 8)
+    const int hourDiff = 7;
+    if (data->hour < hourDiff)
     {
         data->hour = data->hour + 24 - hourDiff;
     }
     else
     {
-        data->hour -= 8;
+        data->hour -= hourDiff;
     }
 }
 
@@ -150,7 +150,8 @@ void vTaskIdleComputations(void *pvParameters)
             ESP_LOGE(TAG, "Parsing failed!");
         }
 
-        sendDataToQueue(&dataHolder);
+        sendTimeDataToQueue(sunriseTime, &(dataHolder.sunriseTime));
+        sendTimeDataToQueue(sunsetTime, &(dataHolder.sunsetTime));
 
         udpSocket = udp_getUDPsocket();
         udp_sendMsg(udpSocket);
