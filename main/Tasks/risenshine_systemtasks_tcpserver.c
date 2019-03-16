@@ -35,14 +35,7 @@ void processTCPCommand(char* dataBuffer, int len)
 
 static void handleNewClient(int socket)
 {
-    char msgPayload[512];
-    int msgLenBytes;
-    
-    do
-    {
-        msgLenBytes = tcp_recvMessage(socket, msgPayload, sizeof(msgPayload));
-        tcp_sendMessage(socket, msgPayload, msgLenBytes);
-    } while (msgLenBytes > 0);
+    gui_menuApi(&tcp_sendMessage, &tcp_recvMessage, socket);
 }
 
 void vTaskTCPServer(void *pvParameters)

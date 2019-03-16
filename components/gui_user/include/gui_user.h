@@ -8,3 +8,5 @@ typedef enum {
     USRCMD_EXIT,
     USRCMD_INVALID
 } userCommands_e;
+
+void gui_menuApi(bool(*sendMsg)(char*msg, uint len), int(*recvMsg)(char*msg, uint len));
