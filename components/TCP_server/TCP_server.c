@@ -76,7 +76,7 @@ static uint32_t returnMinSize(uint32_t num1, uint32_t num2)
     else return num1;
 }
 
-bool tcp_recvMessage(int socket, char* msgBuffer, uint32_t msgBufferSize)
+int tcp_recvMessage(int socket, char* msgBuffer, uint32_t msgBufferSize)
 {
     const uint32_t rxBufferSize = 128;
     char rxBuffer[rxBufferSize];
