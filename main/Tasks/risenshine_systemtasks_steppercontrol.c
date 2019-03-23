@@ -8,39 +8,77 @@
 
 #include "stepper.h"
 #include "driver/hw_timer.h"
+#include "esp_log.h"
+
+static const char * TAG = "Stepper control task";
 
 #define STEPPER_FREQUENCY_uS 10000 // 100 Hz = 1 / 10000 us
 #define TIMER_AUTORELOAD_TRUE true
-#define BLINDSNUMSTEPS 3000
+#define BLINDSNUMSTEPS 10000
 
+/*  To open blinds: go CCW
+    To close blinds: go CW */
+
+// until tilt sensor is operational, initial state of the blinds must be CLOSED
 static bool isBlindsOpen = false;
 
 static void openBlinds()
 {
     if(!isBlindsOpen) 
     {
-        stepper_setStepperDirection(CLOCKWISE);
-        stepper_moveStepper()
+        stepper_setStepperDirection(COUNTCLOCKWISE);
+        stepper_moveStepper(BLINDSNUMSTEPS);
     }
 }
 
+static void closeBlinds()
+{
+    if(isBlindsOpen)
+    {
+        stepper_setStepperDirection(CLOCKWISE);
+        stepper_moveStepper(BLINDSNUMSTEPS);
+    }
+}
+
+
+//need tilt sensor to use this
 static void initializeBlindsPosition()
 {
-    stepper_setStepperDirection(COUNTCLOCKWISE);
+    //stepper_setStepperDirection(COUNTCLOCKWISE);
+    return;
+}
 
+static void parseStepCommand(stepCmd_e cmd)
+{
+    switch(cmd)
+    {
+        case STEPCMD_OPENBLINDS:
+            openBlinds();
+            break;
+        case STEPCMD_CLOSEBLINDS:
+            closeBlinds();
+            break;
+        case STEPCMD_STOP:
+            stepper_stopStepper();
+            break;
+        default:
+            ESP_LOGE(TAG, "Error: Unknown stepper command");
+            return;
+    }
 }
 
 void vTaskStepperMotorControl(void *pvParameters)
 {
     stepper_initStepperPins();
-    //const TickType_t xDelayDuration = STEPPER_FREQUENCY_MS / portTICK_PERIOD_MS;
-    int numStepsToAdd = 0;
+    initializeBlindsPosition();
+
+    stepCmd_e stepCommand;
 
     hw_timer_init(stepper_applyState, NULL);
     hw_timer_alarm_us(STEPPER_FREQUENCY_uS, TIMER_AUTORELOAD_TRUE);
     while(1) 
     {
-        if (xQueueReceive(qStepperMotorSteps,&numStepsToAdd,portMAX_DELAY) == pdTRUE)
+        if (xQueueReceive(qStepperCommands,&stepCommand,portMAX_DELAY) == pdTRUE)
         {
             stepper_moveStepper(numStepsToAdd);
         }

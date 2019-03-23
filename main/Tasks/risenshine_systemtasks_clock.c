@@ -12,6 +12,7 @@
 #define TICK_INTERVAL_MS 1000
 
 static const char* TAG = "clock_management_log";
+static const TickType_t queueDelayMs = 500 / portTICK_PERIOD_MS;
 
 void vTaskClockSystem(void *pvParameters)
 {
@@ -41,6 +42,7 @@ void vTaskClockSystem(void *pvParameters)
 	gpio_set_level(GPIO_LED_OUTPUT_IO, 0); //only visual indication that wifi is ready
 
 	timePackage_t recvTimePackage;
+	stepCmd_e stepCommand = STEPCMD_INVALID;
 	//int cnt = 0;
 
 	ESP_LOGI(TAG, "Start Task");
@@ -56,7 +58,8 @@ void vTaskClockSystem(void *pvParameters)
 		{
 			if(compare_time(&current_time, &sunrise_time) == 1)
 			{
-				//send command to open blinds
+				stepCommand = STEPCMD_OPENBLINDS;
+				xQueueSend(qStepperCommands, &stepCommand, queueDelayMs);
 			}
 		}
 		
@@ -65,7 +68,8 @@ void vTaskClockSystem(void *pvParameters)
 		{
 			if(compare_time(&current_time, &sunset_time) == 1)
 			{
-				//send command to close blinds
+				stepCommand = STEPCMD_CLOSEBLINDS;
+				xQueueSend(qStepperCommands, &stepCommand, queueDelayMs);
 			}
 		}
 

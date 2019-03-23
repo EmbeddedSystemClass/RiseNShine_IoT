@@ -30,10 +30,10 @@
 #include "esp_log.h"
 #include "driver/gpio.h"
 
-#define stepperPinA 14 // D5
-#define stepperPinB 12 // D6
-#define stepperPinC 13 // D7
-#define stepperPinD 15 // D8
+#define stepperPinA 15 // D8
+#define stepperPinB 13 // D7
+#define stepperPinC 12 // D6
+#define stepperPinD 14 // D5
 
 #define GPIO_STEPPER_OUTPUT_BITMASK ( (1ULL<<stepperPinA) | \
                                       (1ULL<<stepperPinB) | \
