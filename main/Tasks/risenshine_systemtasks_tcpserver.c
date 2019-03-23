@@ -7,6 +7,7 @@
 #include "risenshine_systemtasks.h"
 
 #include "TCP_server.h"
+#include "gui_user.h"
 
 #include "esp_log.h"
 
@@ -31,6 +32,13 @@ void processTCPCommand(char* dataBuffer, int len)
     int numSteps = charToInt(dataBuffer, len);
     ESP_LOGI(TAG, "Received number: %d", numSteps);
     xQueueSend(qStepperMotorSteps, &numSteps, 0);
+}
+
+//temp function
+void gui_sendStepperSteps(int steps)
+{
+    ESP_LOGI(TAG, "Added steps: %d", steps);
+    xQueueSend(qStepperMotorSteps, &steps, 0);
 }
 
 static void handleNewClient(int socket)

@@ -1,5 +1,7 @@
 /* gui_user.h */
 
+#include "esp_system.h"
+
 typedef enum {
     USRCMD_GOTOMAINMENU = 0,
     USRCMD_SETDIRECTION,
@@ -9,4 +11,4 @@ typedef enum {
     USRCMD_INVALID
 } userCommands_e;
 
-void gui_menuApi(bool(*sendMsg)(char*msg, uint len), int(*recvMsg)(char*msg, uint len));
+void gui_menuApi(bool(*sendMsg)(int s, char*msg, uint msgLen), int(*recvMsg)(int s, char*msg, uint bufferLen), int s);
