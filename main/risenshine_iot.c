@@ -17,6 +17,7 @@ void app_main()
     //init queues
     qStepperMotorSteps = xQueueCreate(2, sizeof(int));
     qClockUpdate = xQueueCreate(2, sizeof(timePackage_t));
+    qStepperCommands = xQueueCreate(2, sizeof(stepCmd_e));
 
     xTaskCreate_wrapper(s_clockMgtTask);
     xTaskCreate_wrapper(s_TCPServerTask);

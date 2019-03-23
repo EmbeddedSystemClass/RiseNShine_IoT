@@ -15,6 +15,7 @@
 
 // Queues
 QueueHandle_t qStepperMotorSteps;
+QueueHandle_t qStepperCommands;
 QueueHandle_t qClockUpdate;
 
 void vTaskClockSystem(void* pvParameters);
@@ -28,6 +29,13 @@ typedef enum {
     sunsetTime,
     sunriseTime,
 } timeType_e;
+
+typedef enum {
+    STEPCMD_OPENBLINDS = 0,
+    STEPCMD_CLOSEBLINDS,
+    STEPCMD_STOP,
+    STEPCMD_INVALID
+} stepCmd_e;
 
 typedef struct {
     timeType_e timeType;
