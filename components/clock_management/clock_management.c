@@ -10,10 +10,10 @@ implementation of clock management.h
 /*
  * Helper functions
  */
-int compare_time(timeFormat_t* time1, timeFormat_t* time2)
+bool compare_time(timeFormat_t* time1, timeFormat_t* time2)
 {
-	if(time1->hour == time2->hour && time1->minute == time2->minute) return 1;
-	else return 0;
+	if(time1->hour == time2->hour && time1->minute == time2->minute) return true;
+	else return false;
 }
 
 void set_time(timeFormat_t* time, unsigned int hr, unsigned int min, unsigned int sec)

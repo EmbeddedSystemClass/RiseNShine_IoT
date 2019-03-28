@@ -56,7 +56,7 @@ void vTaskClockSystem(void *pvParameters)
 		//check every minute
 		if(current_time.second == 0)
 		{
-			if(compare_time(&current_time, &sunrise_time) == 1)
+			if(compare_time(&current_time, &sunrise_time) == true)
 			{
 				stepCommand = STEPCMD_OPENBLINDS;
 				xQueueSend(qStepperCommands, &stepCommand, queueDelayMs);
@@ -66,7 +66,7 @@ void vTaskClockSystem(void *pvParameters)
 		//check every minute
 		if(current_time.second == 30) 
 		{
-			if(compare_time(&current_time, &sunset_time) == 1)
+			if(compare_time(&current_time, &sunset_time) == true)
 			{
 				stepCommand = STEPCMD_CLOSEBLINDS;
 				xQueueSend(qStepperCommands, &stepCommand, queueDelayMs);

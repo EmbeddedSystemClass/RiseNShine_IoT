@@ -27,7 +27,7 @@ typedef struct {
 	unsigned int second;
 } timeFormat_t;
 
-int compare_time(timeFormat_t* time1, timeFormat_t* time2);
+bool compare_time(timeFormat_t* time1, timeFormat_t* time2);
 void set_time(timeFormat_t* time, unsigned int hr, unsigned int min, unsigned int sec);
 void increment_time(timeFormat_t* time);
 
