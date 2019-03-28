@@ -57,9 +57,6 @@ int http_connectSocket()
 void http_sendRequest(int s, char payload[], int payloadSize)
 {
     int nRead;
-    char recv_buffer[128];
-    int cursor = 0;
-
 
     if (write(s, REQUEST, strlen(REQUEST)) < 0) {
         ESP_LOGE(TAG, "socket send failed");

@@ -10,11 +10,7 @@
 #include "driver/hw_timer.h"
 #include "esp_log.h"
 
-<<<<<<< HEAD
 static const char * TAG = "Stepper Control task";
-=======
-static const char * TAG = "Stepper control task";
->>>>>>> 685c50fcc2df5b9afe025861a87f77eb9d4aefe6
 
 #define STEPPER_FREQUENCY_uS 10000 // 100 Hz = 1 / 10000 us
 #define TIMER_AUTORELOAD_TRUE true
@@ -84,8 +80,7 @@ void vTaskStepperMotorControl(void *pvParameters)
     {
         if (xQueueReceive(qStepperCommands,&stepCommand,portMAX_DELAY) == pdTRUE)
         {
-            ESP_LOGI(TAG, "Recv'd steps: %d", numStepsToAdd);
-            stepper_moveStepper(numStepsToAdd);
+            parseStepCommand(stepCommand);
         }
     }
 }

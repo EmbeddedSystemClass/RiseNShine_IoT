@@ -12,7 +12,7 @@ implementation of clock management.h
  */
 int compare_time(timeFormat_t* time1, timeFormat_t* time2)
 {
-	if(time1->hour == time2->hour || time1->minute == time2->minute) return 1;
+	if(time1->hour == time2->hour && time1->minute == time2->minute) return 1;
 	else return 0;
 }
 

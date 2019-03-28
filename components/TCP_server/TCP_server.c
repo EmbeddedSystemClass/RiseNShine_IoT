@@ -70,18 +70,11 @@ bool tcp_sendMessage(int socket, char* payload, uint32_t len)
     return true;
 }
 
-static uint32_t returnMinSize(uint32_t num1, uint32_t num2)
-{
-    if (num1 > num2) return num2;
-    else return num1;
-}
-
 int tcp_recvMessage(int socket, char* msgBuffer, uint32_t msgBufferSize)
 {
     const uint32_t rxBufferSize = 128;
     char rxBuffer[rxBufferSize];
     char addr_str[128];
-    uint32_t nWritten = 0;
     struct sockaddr_in sourceAddr;
 
     int bytesRecv = recv(socket, rxBuffer, rxBufferSize - 1, 0);
