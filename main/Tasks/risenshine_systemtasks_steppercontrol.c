@@ -10,7 +10,7 @@
 #include "driver/hw_timer.h"
 #include "esp_log.h"
 
-static const char * TAG = "Stepper Control task";
+static const char * TAG = "Stepper control task";
 
 #define STEPPER_FREQUENCY_uS 10000 // 100 Hz = 1 / 10000 us
 #define TIMER_AUTORELOAD_TRUE true
