@@ -46,6 +46,39 @@ void stepper_stopStepper()
 }
 
 /**
+ * Gets if the stepper currently has steps to be run
+ *
+ * @param bool true if there's steps to be done
+ *             false if there's none
+ */
+inline bool stepper_isRunning()
+{
+    if(numStepsLeft != 0)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+/**
+ * Place stepper in idle mode by turning off all GPIO pins
+ * 
+ * @return bool true if state is changed, false if there's still steps
+ */
+bool stepper_idleMode()
+{
+    if(stepper_isRunning())
+    {
+        stepperState = stateIdle;
+        return true;
+    }
+    return false;
+}
+
+/**
  * Set the direction of the stepper
  * 
  * @return If valid direction, returns true
@@ -105,12 +138,17 @@ static void changeState()
     }
 }
 
+static void turnOffPins()
+{
+    changePinOutputs(OFF, OFF, OFF, OFF);
+}
+
 /**
  * Applies the new state by accessing the GPIO pins
  */
 void stepper_applyState() 
 {
-    if (numStepsLeft != 0) 
+    if (stepper_isRunning()) 
     {
         changeState();
         switch(stepperState) {
@@ -130,6 +168,10 @@ void stepper_applyState()
                 changePinOutputs(OFF, OFF, OFF, OFF);
         }
         numStepsLeft--;
+    }
+    else
+    {
+        turnOffPins();
     }
 }
 
