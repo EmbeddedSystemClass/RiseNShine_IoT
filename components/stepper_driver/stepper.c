@@ -120,11 +120,7 @@ static void changePinOutputs(stepperState_e A, stepperState_e B, stepperState_e 
 
 static void changeState() 
 {
-    if (stepperState == stateIdle)
-    {
-        return;
-    }
-    else if (cwDirection == CLOCKWISE) 
+    if (cwDirection == CLOCKWISE) 
     {
         stepperState++;
         if (stepperState == ((int)stateD+1)) 
@@ -152,7 +148,7 @@ static void turnOffPins()
  */
 void stepper_applyState() 
 {
-    if (numStepsLeft != 0) 
+    if (stepper_isRunning()) 
     {
         changeState();
         switch(stepperState) {
