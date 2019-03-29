@@ -105,7 +105,7 @@ bool stepper_setStepperDirection(stepperState_e newDirection)
 /**
  * Changes the direction of the current stepper direction
  */
-bool stepper_changeStepperDirection() 
+void stepper_changeStepperDirection() 
 {
     cwDirection = !cwDirection;
 }

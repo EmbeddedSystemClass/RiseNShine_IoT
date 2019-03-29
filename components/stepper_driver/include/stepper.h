@@ -55,7 +55,7 @@ typedef enum
     stateB,
     stateC,
     stateD,
-    stateIdle
+    stateIdle,
 
     //for direction
     CLOCKWISE = 0,
