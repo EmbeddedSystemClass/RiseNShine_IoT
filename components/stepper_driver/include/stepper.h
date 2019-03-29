@@ -55,6 +55,7 @@ typedef enum
     stateB,
     stateC,
     stateD,
+    stateIdle
 
     //for direction
     CLOCKWISE = 0,
@@ -64,6 +65,8 @@ typedef enum
 void stepper_initStepperPins();
 void stepper_moveStepper(int stepsnum);
 void stepper_stopStepper();
+bool stepper_isRunning();
+bool stepper_idleMode();
 bool stepper_setStepperDirection(stepperState_e dir);
 void stepper_changeStepperDirection();
 void stepper_applyState();
