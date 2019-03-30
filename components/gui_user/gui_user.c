@@ -10,6 +10,8 @@
 #include "freertos/queue.h"
 #include "risenshine_systemtasks.h" // for stepCmd_e
 
+#include "clock_management.h"
+
 #define MSGBUFFERLENGTHBYTES 512
 
 static const char * TAG = "GUI User";
@@ -62,10 +64,11 @@ static void gui_printMenu()
                    "  (2) Close blinds                   \n"
                    "  (3) Get blinds status              \n"
                    "  (4) Get current time stored        \n"
-                   "  (5) Set direction (0 = CW, 1 = CCW)\n"
-                   "  (6) Stop Stepper                   \n"
-                   "  (7) Add stepper steps              \n"
-                   "  (8) EXIT                           \n"
+                   "  (5) Get sunrise time stored        \n"
+                   "  (6) Get sunset time stored         \n"
+                   "  (7) Set direction (0 = CW, 1 = CCW)\n"
+                   "  (8) Stop Stepper                   \n"
+                   "  (9) Add stepper steps              \n"
                    "=====================================\n";
     gui_copyMsgToSend(menu, sizeof(menu));     
 }
@@ -104,12 +107,33 @@ static void gui_getBlindsStatus()
 
 static void gui_getCurrentTime()
 {
-    char msg[12];
-    ///@todo Issue # 1: Expose the clock module
-    //sprintf(msg, "Current time: %d:%d:%d", )
+    char msg[20];
+    timeFormat_t currentTime;
+    clock_getTime(CLOCK_CURRENTTIME, &currentTime);
+    memset(msg, 0, sizeof(msg));
+    sprintf(msg, "Current time: %02d:%02d:%02d", currentTime.hour, currentTime.minute, currentTime.second);
     gui_copyMsgToSend(msg, sizeof(msg));
 }
 
+static void gui_getSunriseTime()
+{
+    char msg[20];
+    timeFormat_t sunriseTime;
+    clock_getTime(CLOCK_SUNRISETIME, &sunriseTime);
+    memset(msg, 0, sizeof(msg));
+    sprintf(msg, "Sunrise time: %02d:%02d:%02d", sunriseTime.hour, sunriseTime.minute, sunriseTime.second);
+    gui_copyMsgToSend(msg, sizeof(msg));
+}
+
+static void gui_getSunsetTime()
+{
+    char msg[20];
+    timeFormat_t sunsetTime;
+    clock_getTime(CLOCK_SUNSETTIME, &sunsetTime);
+    memset(msg, 0, sizeof(msg));
+    sprintf(msg, "Sunset time: %02d:%02d:%02d", sunsetTime.hour, sunsetTime.minute, sunsetTime.second);
+    gui_copyMsgToSend(msg, sizeof(msg));
+}
 
 static void gui_setStepperDirection(int set)
 {
@@ -166,6 +190,12 @@ static void gui_processCmd(msgPacket_t dataPkg)
             break;
         case USRCMD_GETCURRENTTIME:
             gui_getCurrentTime();
+            break;
+        case USRCMD_GETSUNRISETIME:
+            gui_getSunriseTime();
+            break;
+        case USRCMD_GETSUNSETTIME:
+            gui_getSunsetTime();
             break;
         case USRCMD_SETDIRECTION:
             gui_setStepperDirection(dataPkg.data);
