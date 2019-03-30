@@ -52,7 +52,7 @@ void stepper_stopStepper()
  * @param bool true if there's steps to be done
  *             false if there's none
  */
-bool stepper_isRunning()
+inline bool stepper_isRunning()
 {
     if(numStepsLeft > 0)
     {
@@ -149,7 +149,7 @@ static void turnOffPins()
  */
 void stepper_applyState() 
 {
-    if (numStepsLeft != 0) 
+    if (stepper_isRunning()) 
     {
         changeState();
         switch(stepperState) {
