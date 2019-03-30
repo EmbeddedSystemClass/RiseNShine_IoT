@@ -28,6 +28,7 @@ static void openBlinds()
     {
         stepper_setStepperDirection(COUNTCLOCKWISE);
         stepper_moveStepper(BLINDSNUMSTEPS);
+        isBlindsOpen = true;
     }
 }
 
@@ -37,6 +38,7 @@ static void closeBlinds()
     {
         stepper_setStepperDirection(CLOCKWISE);
         stepper_moveStepper(BLINDSNUMSTEPS);
+        isBlindsOpen = false;
     }
 }
 
