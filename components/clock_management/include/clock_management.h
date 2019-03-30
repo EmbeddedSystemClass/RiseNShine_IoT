@@ -1,12 +1,9 @@
 /*
-clock_management.h
-
-
-System clock management
-
-This module contains the hardware timer used to keep track of the system time using hour, minutes and seconds.
-
-*/
+ * clock_management.h
+ * This module contains the clock related functions used to keep track 
+ * of the system time using hour, minutes and seconds. It also contains
+ * functions to manage the sunrise and sunset times.
+ */
 
 #pragma once
 
@@ -27,7 +24,14 @@ typedef struct {
 	unsigned int second;
 } timeFormat_t;
 
-bool compare_time(timeFormat_t* time1, timeFormat_t* time2);
-void set_time(timeFormat_t* time, unsigned int hr, unsigned int min, unsigned int sec);
-void increment_time(timeFormat_t* time);
+typedef enum {
+	CLOCK_CURRENTTIME = 0,
+	CLOCK_SUNSETTIME,
+	CLOCK_SUNRISETIME
+} clockType_e;
 
+bool clock_compareTime(clockType_e clock1, clockType_e clock2);
+bool clock_compareToCurrentTime(clockType_e clock1);
+void clock_incrementCurrentTime();
+bool clock_setTime(clockType_e clockType, timeFormat_t *newTime);
+void clock_getTime(clockType_e clockType, timeFormat_t *const data);
