@@ -15,7 +15,6 @@ void app_main()
     wait_for_ip();
 
     //init queues
-    qClockUpdate = xQueueCreate(2, sizeof(timePackage_t));
     qStepperCommands = xQueueCreate(2, sizeof(stepCmd_e));
 
     xTaskCreate_wrapper(s_clockMgtTask);

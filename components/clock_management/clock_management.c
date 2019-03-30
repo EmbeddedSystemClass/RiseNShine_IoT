@@ -1,44 +1,115 @@
-/*
-clock_management.c
-
-implementation of clock management.h
-
-*/
+/**
+ * clock_management.c
+ * Implementation of clock management.h
+ */
 
 #include "clock_management.h"
+#include "clockdata.h"
+#include "FreeRTOS.h"
+#include "freertos/task.h"
 
-/*
- * Helper functions
- */
-bool compare_time(timeFormat_t* time1, timeFormat_t* time2)
+static bool compareTime(timeFormat_t* time1, timeFormat_t* time2)
 {
 	if(time1->hour == time2->hour && time1->minute == time2->minute) return true;
 	else return false;
 }
 
-void set_time(timeFormat_t* time, unsigned int hr, unsigned int min, unsigned int sec)
+/**
+ * Compares two clocks
+ * 
+ * @param clock1 Type of clock to compare with clcok2
+ * @param clock2 Type of clock to compare with clock1
+ */
+bool clock_compareTime(clockType_e clock1, clockType_e clock2)
 {
-	time->hour = hr;
-	time->minute = min;
-	time->second = sec;
+	timeFormat_t clk1, clk2;
+	clock_getTime(clock1, &clk1);
+	clock_getTime(clock2, &clk2);
+	return compareTime(&clk1, &clk2);
 }
 
-void increment_time(timeFormat_t* time)
+/**
+ * Increments the current time
+ * 
+ * @note care should be done that multiple function calls may
+ *       lead to undesired result.
+ */
+void clock_incrementCurrentTime()
 {
-	time->second++;
-	if (time->second >= 60) 
+	currentTime.second++;
+	if (currentTime.second >= 60) 
 	{
-		time->second = 0;
-		time->minute++;
+		currentTime.second = 0;
+		currentTime.minute++;
 	}
 
-	if (time->minute >= 60)
+	if (currentTime.minute >= 60)
 	{
-		time->minute=0;
-		time->hour++;
+		currentTime.minute=0;
+		currentTime.hour++;
 	}
 
-	if (time->hour >= 24) time->hour = 0;
+	if (currentTime.hour >= 24) currentTime.hour = 0;
 }
 
+static void setTime(timeFormat_t *const srcClock, timeFormat_t *const destClock)
+{
+	vTaskSuspendAll(); // prevent preemption
+	destClock->hour		= srcClock->hour;
+	destClock->minute	= srcClock->minute;
+	destClock->second	= srcClock->second;
+	xTaskResumeAll();
+}
 
+/**
+ * Sets the time of the specified clock
+ * 
+ * @param clockType desired clock to change
+ * @param data pointer to the new time
+ */
+void clock_setTime(clockType_e clockType, timeFormat_t *const data)
+{
+	switch(clockType)
+	{
+		case CLOCK_CURRENTTIME:
+			setTime(data, &currentTime);
+			break;
+		case CLOCK_SUNSETTIME:
+			setTime(data, &sunsetTime);
+			break;
+		case CLOCK_SUNRISETIME:
+			setTime(data, &sunriseTime);
+			break;
+		default:
+			break;
+			// assert
+	}
+	return;
+}
+
+/**
+ * Returns the data of the speciied data
+ * 
+ * @param clockType clock type of the desired clock
+ * @param data pointer to place the data
+ * @return the data of the specified clock in timeFormat_t
+ */
+void clock_getTime(clockType_e clockType, timeFormat_t *const data)
+{
+	switch(clockType)
+	{
+		case CLOCK_CURRENTTIME:
+			setTime(&currentTime, data);
+			break;
+		case CLOCK_SUNSETTIME:
+			setTime(&sunsetTime, data);
+			break;
+		case CLOCK_SUNRISETIME:
+			setTime(&sunriseTime, data);
+			break;
+		default:
+			break;
+			// assert
+	}
+	return;
+}
