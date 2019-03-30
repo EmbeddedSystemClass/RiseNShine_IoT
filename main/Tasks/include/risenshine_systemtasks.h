@@ -16,7 +16,6 @@
 /// @todo: Issue #14 get these outta here
 // Queues
 QueueHandle_t qStepperCommands;
-QueueHandle_t qClockUpdate;
 
 void vTaskClockSystem(void* pvParameters);
 void vTaskTCPServer(void* pvParameters);

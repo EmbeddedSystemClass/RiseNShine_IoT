@@ -9,10 +9,6 @@
 #include "TCP_server.h"
 #include "gui_user.h"
 
-#include "esp_log.h"
-
-static const char * TAG = "TCP task";
-
 static void handleNewClient(int socket)
 {
     gui_menuApi(&tcp_sendMessage, &tcp_recvMessage, socket);

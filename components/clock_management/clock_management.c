@@ -1,14 +1,14 @@
-/*
-clock_management.c
-
-implementation of clock management.h
-
-*/
+/**
+ * clock_management.c
+ * Implementation of clock management.h
+ */
 
 #include "clock_management.h"
 #include "clockdata.h"
+#include "FreeRTOS.h"
+#include "freertos/task.h"
 
-static bool compareTime(timeFormat_t* time1, timeFormat_t* time2);
+static bool compareTime(timeFormat_t* time1, timeFormat_t* time2)
 {
 	if(time1->hour == time2->hour && time1->minute == time2->minute) return true;
 	else return false;
@@ -34,7 +34,7 @@ bool clock_compareTime(clockType_e clock1, clockType_e clock2)
  * @note care should be done that multiple function calls may
  *       lead to undesired result.
  */
-void clock_incrementCurrentTime();
+void clock_incrementCurrentTime()
 {
 	currentTime.second++;
 	if (currentTime.second >= 60) 
@@ -54,9 +54,11 @@ void clock_incrementCurrentTime();
 
 static void setTime(timeFormat_t *const srcClock, timeFormat_t *const destClock)
 {
+	vTaskSuspendAll(); // prevent preemption
 	destClock->hour		= srcClock->hour;
 	destClock->minute	= srcClock->minute;
 	destClock->second	= srcClock->second;
+	xTaskResumeAll();
 }
 
 /**
@@ -79,6 +81,7 @@ void clock_setTime(clockType_e clockType, timeFormat_t *const data)
 			setTime(data, &sunriseTime);
 			break;
 		default:
+			break;
 			// assert
 	}
 	return;
@@ -105,6 +108,7 @@ void clock_getTime(clockType_e clockType, timeFormat_t *const data)
 			setTime(&sunriseTime, data);
 			break;
 		default:
+			break;
 			// assert
 	}
 	return;

@@ -17,16 +17,16 @@ timeFormat_t currentTime = {
     .hour = 0,
     .minute = 0,
     .second = 0
-}
+};
 
 timeFormat_t sunriseTime = {
-    .hour = 0,
+    .hour = 6,
     .minute = 0,
     .second = 0
-}
+};
 
 timeFormat_t sunsetTime = {
-    .hour = 0,
+    .hour = 18,
     .minute = 0,
     .second = 0
-}
+};

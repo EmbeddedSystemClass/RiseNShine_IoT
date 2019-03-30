@@ -8,6 +8,7 @@
 
 #include "http_get.h"
 #include "get_NTP.h"
+#include "clock_management.h"
 
 #include "esp_log.h"
 
@@ -71,35 +72,16 @@ static char * getHTMLContent(char * data)
     return strstr(data, "\r\n\r\n");
 }
 
-static timePackage_t createPackage(timeType_e type, timeFormat_t *time)
-{
-    timePackage_t package = {
-        .timeType = type,
-        .timeData = *time
-    };
-    return package;
-}
-
-static void sendTimeDataToQueue(timeType_e type, timeFormat_t * data)
-{
-    timePackage_t package = createPackage(sunriseTime, data);
-    xQueueSend(qClockUpdate, &package, 0);
-
-    package = createPackage(sunsetTime, data);
-    xQueueSend(qClockUpdate, &package, 0);
-}
-
 void processNTPResult(uint32_t *data)
 {
     uint32_t convertedTime = *data - BASELINETIME - LOCALTIME;
     ESP_LOGI(TAG, "Received UNIX time: %d", convertedTime);
-    timePackage_t package = {
-        .timeType = currentTime,
-        .timeData.hour = convertedTime / 3600 % 24,
-        .timeData.minute = convertedTime / 60 % 60,
-        .timeData.second = convertedTime % 60
+    timeFormat_t newCurrTime = {
+        .hour = convertedTime / 3600 % 24,
+        .minute = convertedTime / 60 % 60,
+        .second = convertedTime % 60
     };
-    xQueueSend(qClockUpdate, &package, 0);
+    clock_setTime(CLOCK_CURRENTTIME, &newCurrTime);
 }
 
 static void convertToLocalTime(timeFormat_t *data)
@@ -150,8 +132,8 @@ void vTaskIdleComputations(void *pvParameters)
             ESP_LOGE(TAG, "Parsing failed!");
         }
 
-        sendTimeDataToQueue(sunriseTime, &(dataHolder.sunriseTime));
-        sendTimeDataToQueue(sunsetTime, &(dataHolder.sunsetTime));
+        clock_setTime(CLOCK_SUNRISETIME, &(dataHolder.sunriseTime));
+        clock_setTime(CLOCK_SUNSETTIME, &(dataHolder.sunsetTime));
 
         udpSocket = udp_getUDPsocket();
         udp_sendMsg(udpSocket);
