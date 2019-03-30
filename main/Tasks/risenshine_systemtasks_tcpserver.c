@@ -13,34 +13,6 @@
 
 static const char * TAG = "TCP task";
 
-static int charToInt(char * chars, int len)
-{
-    int x = 0;
-    int i;
-    for(i = 0; i < len; i++) 
-    {
-        if(chars[i] >= '0' && chars[i] <= '9')
-        {
-            x = x*10 + (chars[i]-'0');
-        }
-    }
-    return x;
-}
-
-void processTCPCommand(char* dataBuffer, int len)
-{
-    int numSteps = charToInt(dataBuffer, len);
-    ESP_LOGI(TAG, "Received number: %d", numSteps);
-    xQueueSend(qStepperMotorSteps, &numSteps, 0);
-}
-
-//temp function
-void gui_sendStepperSteps(int steps)
-{
-    ESP_LOGI(TAG, "Added steps: %d", steps);
-    xQueueSend(qStepperMotorSteps, &steps, 0);
-}
-
 static void handleNewClient(int socket)
 {
     gui_menuApi(&tcp_sendMessage, &tcp_recvMessage, socket);

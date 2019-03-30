@@ -20,7 +20,7 @@ static const char * TAG = "Stepper control task";
     To close blinds: go CW */
 
 // until tilt sensor is operational, initial state of the blinds must be CLOSED
-static bool isBlindsOpen = false;
+static volatile bool isBlindsOpen = false;
 
 static void openBlinds()
 {
@@ -78,10 +78,12 @@ void vTaskStepperMotorControl(void *pvParameters)
 
     hw_timer_init(stepper_applyState, NULL);
     hw_timer_alarm_us(STEPPER_FREQUENCY_uS, TIMER_AUTORELOAD_TRUE);
-    while(1) 
+    while(1)
     {
         if (xQueueReceive(qStepperCommands,&stepCommand,portMAX_DELAY) == pdTRUE)
         {
+            ESP_LOGI(TAG, "Received command: %d", stepCommand);
+            ESP_LOGI(TAG, "Blind status: %d", isBlindsOpen);
             parseStepCommand(stepCommand);
         }
     }

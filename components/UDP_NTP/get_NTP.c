@@ -5,7 +5,7 @@
 
 #include "get_NTP.h"
 
-#define NTP_SERVER "time.nist.gov"
+#define NTP_SERVER "time.google.com"
 static const char *TAG = "get_ntp";
 
 int udp_getUDPsocket()

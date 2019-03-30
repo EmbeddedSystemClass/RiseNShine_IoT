@@ -5,15 +5,21 @@
 #include "esp_log.h"
 #include <string.h>
 
+/// @todo: Maybe create a new header primarily to hold queueHandles
+#include "FreeRTOS.h"
+#include "freertos/queue.h"
+#include "risenshine_systemtasks.h" // for stepCmd_e
+
 #define MSGBUFFERLENGTHBYTES 512
 
 static const char * TAG = "GUI User";
 
-extern void gui_sendStepperSteps();
+extern QueueHandle_t qStepperCommand;
 
 static char msgBuffer[MSGBUFFERLENGTHBYTES];
 static bool didUserExit;
 static uint sendMsgLength;
+static const TickType_t queueDelayMs = 500 / portTICK_PERIOD_MS;
 
 typedef struct msgPacket_
 {
@@ -52,13 +58,58 @@ static void gui_printMenu()
 {
     char menu[] =  "=================MENU================\n"
                    "  (0) Print Menu                     \n"
-                   "  (1) Set direction (0 = CW, 1 = CCW)\n"
-                   "  (2) Stop Stepper                   \n"
-                   "  (3) Add stepper steps              \n"
-                   "  (4) EXIT                           \n"
+                   "  (1) Open blinds                    \n"
+                   "  (2) Close blinds                   \n"
+                   "  (3) Get blinds status              \n"
+                   "  (4) Get current time stored        \n"
+                   "  (5) Set direction (0 = CW, 1 = CCW)\n"
+                   "  (6) Stop Stepper                   \n"
+                   "  (7) Add stepper steps              \n"
+                   "  (8) EXIT                           \n"
                    "=====================================\n";
     gui_copyMsgToSend(menu, sizeof(menu));     
 }
+
+static void gui_openBlinds()
+{
+    char msg[] = "Opening blinds";
+    stepCmd_e stepCommand = STEPCMD_OPENBLINDS;
+    xQueueSend(qStepperCommands, &stepCommand, queueDelayMs);
+    gui_copyMsgToSend(msg, sizeof(msg));
+}
+
+static void gui_closeBlinds()
+{
+    char msg[] = "Closing blinds";
+    stepCmd_e stepCommand = STEPCMD_CLOSEBLINDS;
+    xQueueSend(qStepperCommands, &stepCommand, queueDelayMs);
+    gui_copyMsgToSend(msg, sizeof(msg));
+}
+
+static void gui_getBlindsStatus()
+{
+    bool blindsStatus = true;
+    /// @todo Issue # 13: Expose the blinds status
+    if (blindsStatus)
+    {
+        char msg[] = "Blinds is open";
+        gui_copyMsgToSend(msg, sizeof(msg));
+    }
+    else
+    {
+        char msg[] = "Blinds is closed";
+        gui_copyMsgToSend(msg, sizeof(msg));
+    }
+}
+
+static void gui_getCurrentTime()
+{
+    char msg[12];
+    ///@todo Issue # 1: Expose the clock module
+    //sprintf(msg, "Current time: %d:%d:%d", )
+    gui_copyMsgToSend(msg, sizeof(msg));
+}
+
 
 static void gui_setStepperDirection(int set)
 {
@@ -85,8 +136,9 @@ static void gui_stopStepper()
 
 static void gui_addStepperDirection(int steps)
 {
-    gui_sendStepperSteps(steps);
-    char msg[] = "Added stepper steps\n";
+    stepper_moveStepper(steps);
+    char msg[30]; 
+    sprintf(msg, "Added stepper steps: %d",steps);
     gui_copyMsgToSend(msg, sizeof(msg));
 }
 
@@ -102,6 +154,18 @@ static void gui_processCmd(msgPacket_t dataPkg)
     {
         case USRCMD_GOTOMAINMENU:
             gui_printMenu();
+            break;
+        case USRCMD_OPENBLINDS:
+            gui_openBlinds();
+            break;
+        case USRCMD_CLOSEBLINDS:
+            gui_closeBlinds();
+            break;
+        case USRCMD_GETBLINDSSTATUS:
+            gui_getBlindsStatus();
+            break;
+        case USRCMD_GETCURRENTTIME:
+            gui_getCurrentTime();
             break;
         case USRCMD_SETDIRECTION:
             gui_setStepperDirection(dataPkg.data);
