@@ -13,6 +13,7 @@
 #include "freertos/task.h"
 #include "clock_management.h"
 
+/// @todo: Issue #14 get these outta here
 // Queues
 QueueHandle_t qStepperMotorSteps;
 QueueHandle_t qStepperCommands;
