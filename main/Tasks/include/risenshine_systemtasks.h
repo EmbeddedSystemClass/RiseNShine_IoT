@@ -15,7 +15,6 @@
 
 /// @todo: Issue #14 get these outta here
 // Queues
-QueueHandle_t qStepperMotorSteps;
 QueueHandle_t qStepperCommands;
 QueueHandle_t qClockUpdate;
 

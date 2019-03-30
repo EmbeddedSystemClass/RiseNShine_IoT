@@ -8,7 +8,7 @@
 static char* TAG = "stepper_log_c";
 static stepperState_e cwDirection = CLOCKWISE;
 static int stepperState = (int)stateA;
-static uint numStepsLeft = 0;
+static volatile uint numStepsLeft = 0;
 
 /**
  * Initializes the GPIO pins for the stepper motors. Pins
@@ -42,6 +42,7 @@ void stepper_moveStepper(int stepsnum)
  */
 void stepper_stopStepper() 
 {
+    ESP_LOGI(TAG, "Step state: %d; steps left: %d", stepperState, numStepsLeft);
     numStepsLeft = 0;
 }
 
@@ -51,15 +52,15 @@ void stepper_stopStepper()
  * @param bool true if there's steps to be done
  *             false if there's none
  */
-inline bool stepper_isRunning()
+bool stepper_isRunning()
 {
-    if(numStepsLeft != 0)
+    if(numStepsLeft > 0)
     {
-        return false;
+        return true;
     }
     else
     {
-        return true;
+        return false;
     }
 }
 
@@ -123,7 +124,7 @@ static void changeState()
     if (cwDirection == CLOCKWISE) 
     {
         stepperState++;
-        if (stepperState == ((int)stateD+1)) 
+        if (stepperState >= ((int)stateD+1)) 
         {
             stepperState = (int)stateA;
         }
@@ -131,7 +132,7 @@ static void changeState()
     else if (cwDirection == COUNTCLOCKWISE) 
     {
         stepperState--;
-        if (stepperState ==((int)stateA-1))
+        if (stepperState <=((int)stateA-1))
         {
             stepperState = (int)stateD;
         }
@@ -148,7 +149,7 @@ static void turnOffPins()
  */
 void stepper_applyState() 
 {
-    if (stepper_isRunning()) 
+    if (numStepsLeft != 0) 
     {
         changeState();
         switch(stepperState) {

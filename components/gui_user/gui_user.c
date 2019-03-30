@@ -14,7 +14,6 @@
 
 static const char * TAG = "GUI User";
 
-extern void gui_sendStepperSteps();
 extern QueueHandle_t qStepperCommand;
 
 static char msgBuffer[MSGBUFFERLENGTHBYTES];
@@ -82,7 +81,7 @@ static void gui_openBlinds()
 static void gui_closeBlinds()
 {
     char msg[] = "Closing blinds";
-    stepCmd_e stepCommand = STEPCMD_OPENBLINDS;
+    stepCmd_e stepCommand = STEPCMD_CLOSEBLINDS;
     xQueueSend(qStepperCommands, &stepCommand, queueDelayMs);
     gui_copyMsgToSend(msg, sizeof(msg));
 }
@@ -137,8 +136,9 @@ static void gui_stopStepper()
 
 static void gui_addStepperDirection(int steps)
 {
-    gui_sendStepperSteps(steps);
-    char msg[] = "Added stepper steps\n";
+    stepper_moveStepper(steps);
+    char msg[30]; 
+    sprintf(msg, "Added stepper steps: %d",steps);
     gui_copyMsgToSend(msg, sizeof(msg));
 }
 
