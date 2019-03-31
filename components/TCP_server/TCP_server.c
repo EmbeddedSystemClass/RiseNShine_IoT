@@ -102,7 +102,7 @@ bool tcp_closeSocket(int socket)
     bool status = false;
 
     if (socket != TCP_INVALIDSOCKET) {
-        ESP_LOGE(TAG, "Shutting down socket and restarting...");
+        ESP_LOGE(TAG, "Shutting down TCP socket and restarting...");
         shutdown(socket, 0);
         close(socket);
         status = true;

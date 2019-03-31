@@ -12,6 +12,7 @@
 #include "lwip/sys.h"
 #include <lwip/netdb.h>
 
+#define UDP_INVALIDSOCKET -1
 
 typedef struct {
     uint8_t li_vn_mode;      // Eight bits. li, vn, and mode. [0]
@@ -44,3 +45,4 @@ typedef struct {
 int udp_getUDPsocket();
 void udp_sendMsg(int sock);
 void udp_recvMsg(int sock, void(*call_back_ptr)(uint32_t *data));
+bool udp_closeSocket(int socket);
