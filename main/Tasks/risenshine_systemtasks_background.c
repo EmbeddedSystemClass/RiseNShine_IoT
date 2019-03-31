@@ -139,9 +139,8 @@ void vTaskIdleComputations(void *pvParameters)
         udp_sendMsg(udpSocket);
         vTaskDelay(2000 / portTICK_PERIOD_MS);
         udp_recvMsg(udpSocket, &processNTPResult);
+        udp_closeSocket(udpSocket);
 
         vTaskDelay(30000 / portTICK_PERIOD_MS);
     }
-    
-    
 }

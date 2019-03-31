@@ -24,7 +24,7 @@ int udp_getUDPsocket()
     {
         ESP_LOGE(TAG, "DNS lookup failed err=%d res=%p", err, res);
         freeaddrinfo(res);
-        return -1;
+        return UDP_INVALIDSOCKET;
     }
 
     
@@ -35,7 +35,7 @@ int udp_getUDPsocket()
     if (sock < 0) {
         ESP_LOGE(TAG, "Unable to create socket: errno %d", errno);
         freeaddrinfo(res);
-        return -1;
+        return UDP_INVALIDSOCKET;
     }
     ESP_LOGI(TAG, "Socket created");
 
@@ -43,12 +43,12 @@ int udp_getUDPsocket()
     fcntl(sock, F_SETFL, O_NONBLOCK);
 
     err = connect(sock, res->ai_addr, res->ai_addrlen);
-    if (err == -1)
+    if (err == UDP_INVALIDSOCKET)
     {
         ESP_LOGE(TAG, "Error connecting to server");
         freeaddrinfo(res);
         close(sock);
-        return -1;
+        return UDP_INVALIDSOCKET;
     }
 
     freeaddrinfo(res);
@@ -87,10 +87,16 @@ void udp_recvMsg(int sock, void(*callback_ptr)(uint32_t *data))
         (*callback_ptr)(&recvTime);
         ESP_LOGI(TAG, "Received %d bytes", len);
     }
+}
 
-    if (sock != -1) {
-        ESP_LOGI(TAG, "Shutting down socket and restarting...");
-        shutdown(sock, 0);
-        close(sock);
+bool udp_closeSocket(int socket)
+{
+    if (socket != UDP_INVALIDSOCKET) 
+    {
+        ESP_LOGI(TAG, "Shutting down UDP socket and restarting...");
+        shutdown(socket, 0);
+        close(socket);
+        return true;
     }
+    return false;
 }
