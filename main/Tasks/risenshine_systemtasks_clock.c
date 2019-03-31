@@ -47,7 +47,7 @@ void vTaskClockSystem(void *pvParameters)
 		timeFormat_t currentTime_local;
 		clock_getTime(CLOCK_CURRENTTIME, &currentTime_local);
 		//gpio_set_level(GPIO_LED_OUTPUT_IO, ++cnt % 2)
-		ESP_LOGI(TAG, "Current time: %d:%d:%d", currentTime_local.hour, currentTime_local.minute, currentTime_local.second);
+		//ESP_LOGI(TAG, "Current time: %02d:%02d:%02d", currentTime_local.hour, currentTime_local.minute, currentTime_local.second);
 
 		//check every minute
 		if(currentTime_local.second == 0)

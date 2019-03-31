@@ -107,7 +107,7 @@ static void gui_getBlindsStatus()
 
 static void gui_getCurrentTime()
 {
-    char msg[20];
+    char msg[30];
     timeFormat_t currentTime;
     clock_getTime(CLOCK_CURRENTTIME, &currentTime);
     memset(msg, 0, sizeof(msg));
@@ -117,7 +117,7 @@ static void gui_getCurrentTime()
 
 static void gui_getSunriseTime()
 {
-    char msg[20];
+    char msg[30];
     timeFormat_t sunriseTime;
     clock_getTime(CLOCK_SUNRISETIME, &sunriseTime);
     memset(msg, 0, sizeof(msg));
@@ -127,7 +127,7 @@ static void gui_getSunriseTime()
 
 static void gui_getSunsetTime()
 {
-    char msg[20];
+    char msg[30];
     timeFormat_t sunsetTime;
     clock_getTime(CLOCK_SUNSETTIME, &sunsetTime);
     memset(msg, 0, sizeof(msg));
